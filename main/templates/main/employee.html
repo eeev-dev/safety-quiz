@@ -1,0 +1,50 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'main/css/employee.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <h2> Данные сотрудника </h2>
+
+    <form method="post" action="{% url 'main:index' %}"
+        hx-post="{% url 'main:index' %}"
+        hx-target="#main-content"
+        hx-swap="innerHTML">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="branch">Филиал</label>
+            <select id="branch" name="branch" required>
+                <option value disabled selected>Выберите филиал</option>
+                <option value="moscow">Москва</option>
+                <option value="spb">Санкт-Петербург</option>
+                <option value="kazan">Казань</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="position">Должность</label>
+            <select id="position" name="position" required>
+                <option value disabled selected>Выберите должность</option>
+                <option value="manager">Менеджер</option>
+                <option value="developer">Разработчик</option>
+                <option value="hr">HR</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="fullName">ФИО</label>
+            <input type="text" id="fullName" name="fullName"
+                placeholder="Введите ФИО" required>
+        </div>
+
+        <button type="submit" class="btn">Перейти к выбору билета</button>
+    </form>
+
+</div>
+
+{% endblock %}

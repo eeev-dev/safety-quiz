@@ -1,0 +1,79 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #e6f0ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.card {
+    background: #ffffff;
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.card h2 {
+    margin-top: 0;
+    text-align: center;
+    color: #003366;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    color: #003366;
+    font-weight: 600;
+}
+
+select {
+  appearance: none; /* убирает стандартную стрелку */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+select,
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #cce0ff;
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    background: #f9fbff;
+}
+
+select:focus,
+input[type="text"]:focus {
+    border-color: #3399ff;
+    background: #ffffff;
+}
+
+.btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    background-color: #3399ff;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #007acc;
+}

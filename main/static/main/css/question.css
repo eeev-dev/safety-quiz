@@ -1,0 +1,91 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #e6f0ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh; /* лучше, если содержимое будет адаптивным */
+    padding: 20px; /* чтоб на маленьких экранах не прилегало к краю */
+}
+
+.card {
+    background: #ffffff;
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    min-width: 350px;   /* минимальная ширина */
+    max-width: 800px;   /* максимальная ширина */
+    box-sizing: border-box;
+    word-wrap: break-word; /* перенос длинных слов */
+}
+
+h2 {
+    padding: 0px;
+    margin: 0px;
+}
+
+.question-section p {
+    color: #003366;
+    font-weight: 600;
+    margin-bottom: 30px;
+    font-size: 18px;
+    white-space: pre-wrap; /* чтобы переносить переводы строк и длинные тексты */
+}
+
+label {
+    display: flex;
+    align-items: flex-start; /* для многострочного текста */
+    font-weight: 600;
+    color: #003366;
+    cursor: pointer;
+    padding: 10px 12px;
+    border: 2px solid #cce0ff;
+    border-radius: 12px;
+    background: #f9fbff;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    word-break: break-word; /* перенос слов в ответах */
+    margin-bottom: 20px;
+}
+
+label:hover {
+    background-color: #e0f0ff;
+    border-color: #3399ff;
+}
+
+input[type="radio"] {
+    margin-right: 12px;
+    accent-color: #3399ff;
+    cursor: pointer;
+    margin-top: 4px; /* чтобы радиокнопка была чуть ниже, если текст в несколько строк */
+    flex-shrink: 0; /* чтобы не сжималась */
+    width: 18px;
+    height: 18px;
+}
+
+input[type="radio"]:focus-visible {
+    outline: 2px solid #3399ff;
+    outline-offset: 2px;
+}
+
+.btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    background-color: #3399ff;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #007acc;
+}

@@ -1,0 +1,48 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'main/css/answers.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="card profile-card">
+    <div class="profile-info">
+      <p><strong>Филиал:</strong> Москва</p>
+      <p><strong>Должность:</strong> Инженер-программист</p>
+      <p><strong>ФИО:</strong> Иванов Иван Иванович</p>
+    </div>
+  </div>
+
+  <!-- Карточка с результатами -->
+  <div class="card results-card">
+    <div class="results-header">
+      <div class="score">Правильных ответов: 7/10</div>
+      <div class="status">Вы прошли</div>
+    </div>
+
+    <!-- Карточки с вопросами и ответами -->
+    <div class="answer-card correct">
+      <h3>Вопрос 1: Какой язык программирования используется для создания стилей на веб-страницах?</h3>
+      <p><span class="label">Правильный ответ:</span> CSS</p>
+      <p><span class="label">Ваш ответ:</span> CSS</p>
+    </div>
+
+    <div class="answer-card incorrect">
+      <h3>Вопрос 2: Что такое HTML?</h3>
+      <p><span class="label">Правильный ответ:</span> Язык разметки гипертекста</p>
+      <p><span class="label">Ваш ответ:</span> Язык программирования</p>
+    </div>
+
+    <div class="answer-card correct">
+      <h3>Вопрос 3: Что делает JavaScript?</h3>
+      <p><span class="label">Правильный ответ:</span> Добавляет интерактивность на страницу</p>
+      <p><span class="label">Ваш ответ:</span> Добавляет интерактивность на страницу</p>
+    </div>
+
+    <!-- Добавь другие вопросы по аналогии -->
+  </div>
+
+{% endblock %}
