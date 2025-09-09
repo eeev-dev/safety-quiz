@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block style %}
-<link rel="stylesheet" href="{% static 'main/css/employee.css' %}">
+<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/employee.css' %}">
 {% endblock %}
 
 {% block content %}
