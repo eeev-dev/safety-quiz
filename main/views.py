@@ -5,7 +5,7 @@ from django.template.response import TemplateResponse
 from .models import Employee, Branch, Position
 
 class IndexView(TemplateView):
-    template_name = 'main/base.html'  # Главный шаблон
+    template_name = 'main/base.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -23,25 +23,34 @@ class IndexView(TemplateView):
 
         return TemplateResponse(request, 'main/employee.html', context)
     
+
     def post(self, request: HttpRequest, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-
-        branch_id = request.POST.get('branch_id')
-        position = request.POST.get('position')
-        full_name = request.POST.get('fullName')
-
-        branch = get_object_or_404(Branch, id=branch_id)
-        
-        Employee.objects.create(
-            branch=branch, 
-            position=position, 
-            fio=full_name
-        )
-
         if request.headers.get('HX-Request'):
-            return TemplateResponse(request, 'main/cards.html', context)
-        else:
-            return TemplateResponse(request, 'main/cards.html', context)
+            context = self.get_context_data(**kwargs)
+
+            branch_id = request.POST.get('branch_id')
+            position = request.POST.get('position')
+            full_name = request.POST.get('fullName')
+
+            branch = get_object_or_404(Branch, id=branch_id)
+            employees = Employee.objects.all().filter(
+                fio__icontains=full_name,
+                branch__icontains=branch.title,
+                position__icontains=position
+            )
+
+            if employees.exists():
+                if employees.first().card_number > 0:
+                    return TemplateResponse(request, 'main/answers.html', context)
+                else:
+                    return TemplateResponse(request, 'main/cards.html', context)
+            else:
+                Employee.objects.create(
+                    branch=branch, 
+                    position=position, 
+                    fio=full_name
+                )
+                return TemplateResponse(request, 'main/cards.html', context)
     
 
 class CardsView(TemplateView):
@@ -78,4 +87,18 @@ class AnswersView(TemplateView):
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         return TemplateResponse(request, 'main/answers.html', context)
+    
+    
+class AnnouncementView(TemplateView):
+    template_name = 'main/base.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+    
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        return TemplateResponse(request, 'main/announcement.html', context)
+    
+
 

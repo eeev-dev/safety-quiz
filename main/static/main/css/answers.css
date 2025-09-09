@@ -25,7 +25,6 @@ body {
     word-wrap: break-word;
 }
 
-/* Личная информация */
 .profile-card h2 {
     margin-top: 0;
     text-align: center;
@@ -40,7 +39,6 @@ body {
     font-size: 16px;
 }
 
-/* Результаты */
 .results-header {
     text-align: center;
     margin-bottom: 20px;
@@ -59,7 +57,6 @@ body {
     color: #3399ff;
 }
 
-/* Карточки с ответами */
 .answer-card {
     border-radius: 16px;
     padding: 20px 25px;
@@ -73,14 +70,12 @@ body {
 
 .answer-card.correct {
     background-color: #d4edda;
-    /* светло-зелёный */
     border: 2px solid #28a745;
     box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
 }
 
 .answer-card.incorrect {
     background-color: #f8d7da;
-    /* светло-красный */
     border: 2px solid #dc3545;
     box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
 }

@@ -2,7 +2,7 @@
     <label for="position">Должность</label>
     <select name="position" required>
         {% for position in positions %}
-            <option value="{{ position.id }}">{{ position.title }}</option>
+            <option value="{{ position.title }}">{{ position.title }}</option>
         {% endfor %}
     </select>
 </div>

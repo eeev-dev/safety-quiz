@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Employee, Answer, Card, Question, Option, Branch, Position
 import nested_admin
+from django.core.exceptions import ValidationError
 
 
 class PositionInline(admin.TabularInline):
@@ -10,18 +11,29 @@ class PositionInline(admin.TabularInline):
 
 class OptionInline(nested_admin.NestedTabularInline):
     model = Option
-    extra = 4
+
+    def get_extra(self, request, obj=None, **kwargs):
+        if obj:
+            count = obj.options.count()
+            if count > 0:
+                return 0
+        return 4
 
 
 class QuestionInline(nested_admin.NestedTabularInline):
     model = Question
     inlines = [OptionInline]
-    extra = 1
+    extra = 0
 
 
 class CardAdmin(nested_admin.NestedModelAdmin):
     list_display = ['number']
     inlines = [QuestionInline]
+
+    def save_model(self, request, obj, form, change):
+        if obj.number == 0:
+            raise ValidationError("Нельзя присваивать билету номер 0")
+        super().save_model(request, obj, form, change)
 
 
 class BranchAdmin(admin.ModelAdmin):
@@ -34,8 +46,8 @@ class PositionAdmin(admin.ModelAdmin):
 
 
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ['branch', 'position', 'fio', 'score', 'total', 'is_passed', 'date_passed']
-    list_filter = ['branch', 'fio', 'is_passed', 'date_passed']
+    list_display = ['branch', 'position', 'fio', 'score', 'total', 'card_number', 'date_passed']
+    list_filter = ['branch', 'fio', 'card_number', 'date_passed']
 
 
 class AnswerAdmin(admin.ModelAdmin):

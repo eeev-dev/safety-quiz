@@ -7,8 +7,8 @@ class Employee(models.Model):
     fio = models.CharField("ФИО", max_length=100, default="")
     score = models.IntegerField("Результат", default=0)
     total = models.IntegerField("Всего вопросов", default=10)
-    is_passed = models.BooleanField("Попытка теста", default=False)
-    date_passed = models.DateTimeField("Дата прохождения", auto_now_add=True)
+    date_passed = models.DateTimeField("Дата прохождения", blank=True, null=True)
+    card_number = models.IntegerField("Номер билета", default=0)
 
     def __str__(self):
         return self.fio
@@ -17,7 +17,7 @@ class Employee(models.Model):
 class Answer(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='answers')
     question = models.TextField("Вопрос", default="")
-    answer = models.TextField("Ответ сотрудника", default="")
+    answer = models.TextField("Ответ сотрудника", default="", blank=True, null=True)
     correct_answer = models.TextField("Правильный ответ", default="")
 
     def __str__(self):
@@ -25,17 +25,17 @@ class Answer(models.Model):
 
 
 class Card(models.Model):
-    number = models.IntegerField("Номер билета", default=0)
+    number = models.IntegerField("Номер билета", default=0, unique=True)
 
     def __str__(self):
-        return self.number
+        return f'Билет №{self.number}'
 
 
 class Question(models.Model):
     card = models.ForeignKey(Card, on_delete=models.CASCADE, related_name='questions')
     question_ru = models.TextField("Вопрос на русском", default="")
-    question_kg = models.TextField("Вопрос на кыргызском", default="")
-    image = models.ImageField(upload_to='questions/')
+    question_kg = models.TextField("Вопрос на кыргызском", default="", blank=True, null=True)
+    image = models.ImageField(upload_to='questions/', blank=True, null=True)
 
     def __str__(self):
         return self.question_ru
@@ -44,11 +44,12 @@ class Question(models.Model):
 class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
     option_ru = models.TextField("Вариант ответа на русском", default="")
-    option_kg = models.TextField("Вариант ответа на кыргызском", default="")
+    option_kg = models.TextField("Вариант ответа на кыргызском", default="", blank=True, null=True)
     is_correct = models.BooleanField(default=False)
 
     def __str__(self):
         return self.option_ru
+
 
 class Branch(models.Model):
     title = models.CharField("Название филиала", max_length=100, default="")
