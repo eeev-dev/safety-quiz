@@ -1,15 +1,25 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Техника безопасности </title>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
-    {% block style %} {% endblock %}
-  </head>
-  <body id="main-content">
-    {% block content %} {% endblock %}
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title> Техника безопасности </title>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
+  {% block style %} {% endblock %}
+</head>
+
+<body id="main-content">
+  {% block content %} {% endblock %}
+  <script>
+    document.body.addEventListener('htmx:configRequest', (event) => {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+      event.detail.headers['X-CSRFToken'] = csrfToken;
+    });
+  </script>
+</body>
+
 </html>

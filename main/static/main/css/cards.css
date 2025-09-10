@@ -26,6 +26,10 @@ body {
     justify-items: center;
 }
 
+.cards-container a {
+    text-decoration: none;
+}
+
 .card {
     background: white;
     border-radius: 50%;

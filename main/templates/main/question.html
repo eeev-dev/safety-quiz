@@ -2,11 +2,9 @@
 
 {% load static %}
 
-{% block style %}
-<link rel="stylesheet" href="{% static 'main/css/question.css' %}">
-{% endblock %}
-
 {% block content %}
+
+<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/question.css' %}">
 
 <div class="card">
     <h2>Билет №12</h2>

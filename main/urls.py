@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import IndexView, CardsView, CardView, AnswersView, AnnouncementView
+from .views import IndexView, CardsView, CardView, AnswersView
 
 app_name = 'main'
 

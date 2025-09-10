@@ -1,8 +1,11 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
-from django.http import HttpResponse, HttpRequest
+from django.http import JsonResponse
+from django.shortcuts import redirect
+import json
+from django.http import HttpResponseBadRequest, HttpRequest
 from django.template.response import TemplateResponse
-from .models import Employee, Branch, Position
+from .models import Employee, Branch, Position, Card, Question
 
 class IndexView(TemplateView):
     template_name = 'main/base.html'
@@ -54,15 +57,25 @@ class IndexView(TemplateView):
     
 
 class CardsView(TemplateView):
-    template_name = 'main/base.html'
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
     
     def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        return TemplateResponse(request, 'main/cards.html', context)
+        if request.headers.get('HX-Request'):
+            context = self.get_context_data(**kwargs)
+            context['cards'] = Card.objects.all()
+            return TemplateResponse(request, 'main/partials/card.html', context)
+    
+    def post(self, request: HttpRequest, *args, **kwargs):
+        if (request.headers.get('HX_Request')):
+            context = self.get_context_data(**kwargs)
+            try:
+                card_id = request.POST.get('id')
+                context['questions'] = Question.objects.all().filter(card_id=card_id)
+                return TemplateResponse(request, 'main/question.html', context)
+            except json.JSONDecodeError:
+                return HttpResponseBadRequest('Invalid JSON')
     
 
 class CardView(TemplateView):
