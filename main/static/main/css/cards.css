@@ -26,8 +26,9 @@ body {
     justify-items: center;
 }
 
-.cards-container a {
-    text-decoration: none;
+button.card {
+    outline: none;
+    border: none;
 }
 
 .card {
@@ -44,6 +45,10 @@ body {
     color: #007bff;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cards-container form {
+    appearance: none;
 }
 
 .card:hover {

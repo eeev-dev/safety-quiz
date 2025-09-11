@@ -11,6 +11,7 @@ from slugify import slugify
 from django.contrib.auth import get_user_model
 from string import ascii_letters, digits
 from random import shuffle
+from django.db.models import F
 
 User = get_user_model()
 
@@ -56,6 +57,13 @@ class IndexView(TemplateView):
                 if user is not None:
                     login(request, user)
                     if employee.card_number > 0:
+                        answers = request.user.answers.all()
+                        request.user.total = answers.count()
+                        request.user.save()
+                        correct_answers = answers.filter(answer=F('correct_answer'))
+                        context['employee'] = request.user
+                        context['answers'] = answers
+                        context['is_passed'] = passed_test(correct_answers.count(), answers.count())
                         return TemplateResponse(request, 'main/answers.html', context)
                     else:
                         return TemplateResponse(request, 'main/cards.html', context)
@@ -80,6 +88,8 @@ class IndexView(TemplateView):
     
 
 class CardsView(TemplateView):
+    template_name = 'main/base.html'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
@@ -89,12 +99,18 @@ class CardsView(TemplateView):
             context = self.get_context_data(**kwargs)
             context['cards'] = Card.objects.all()
             return TemplateResponse(request, 'main/partials/card.html', context)
-    
+        
     def post(self, request: HttpRequest, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
         if (request.headers.get('HX_Request')):
-            context = self.get_context_data(**kwargs)
-            card_id = request.POST.get('id')
-            context['card_id'] = card_id
+            card_id = request.GET.get("id")
+            card = get_object_or_404(Card, id=card_id)
+            request.user.card_number = card.number
+            request.user.save()
+            question = Question.objects.filter(card=card).order_by('id').first()
+            context['card_number'] = card.number
+            context['current_question'] = question
+            context['options'] = Option.objects.filter(question=question)
             return TemplateResponse(request, 'main/questions.html', context)
     
 
@@ -103,63 +119,55 @@ class CardView(TemplateView):
         context = super().get_context_data(**kwargs)
         return context
     
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         if request.headers.get('HX-Request'):
-            option_id = request.GET.get('answer')
+            option_id = request.POST.get('answer')
             option = get_object_or_404(Option, id=option_id)
             question = option.question
-            card = question.card    
-            questions = card.questions.order_by('id')
+            card = question.card
+            
+            options = Option.objects.filter(question=question)
+            correct_option = options.filter(is_correct=True).first()
+            Answer.objects.create(
+                employee = request.user,
+                question = question.question_ru,
+                answer = option.option_ru,
+                correct_answer = correct_option.option_ru if correct_option else "Правильный ответ не указан"
+            )
+            if option == correct_option:
+                request.user.score += 1
+                request.user.save()
 
+            questions = card.questions.order_by('id')
             current_index = 0
             for i, q in enumerate(questions):
-                if str(q.id) == question.id:
+                if q.id == question.id:
                     current_index = i + 1
                     break
 
-            if current_index >= len(questions):
+            if current_index < len(questions):
+                question = questions[current_index]
                 context['card_number'] = card.number
                 context['current_question'] = question
                 context['options'] = Option.objects.filter(question=question)
                 return TemplateResponse(request, 'main/questions.html', context)
             else:
+                answers = request.user.answers.all()
+                request.user.total = answers.count()
+                request.user.save()
+                correct_answers = answers.filter(answer=F('correct_answer'))
+                context['employee'] = request.user
+                context['answers'] = answers
+                context['is_passed'] = passed_test(correct_answers.count(), answers.count())
                 return TemplateResponse(request, 'main/answers.html', context)
+            
 
-    def post(self, request: HttpRequest, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        if (request.headers.get('HX_Request')):
-            card_id = request.POST.get("card_id")
-            card = get_object_or_404(Card, id=card_id)
-            question = Question.objects.filter(card=card).order_by('id').first()
-            context['card_number'] = card.number
-            context['current_question'] = question
-            context['options'] = Option.objects.filter(question=question)
-            return TemplateResponse(request, 'main/questions.html', context)
-                    
-
-class AnswersView(TemplateView):
-    template_name = 'main/base.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-    
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        return TemplateResponse(request, 'main/answers.html', context)
-    
-    
-class AnnouncementView(TemplateView):
-    template_name = 'main/base.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-    
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        return TemplateResponse(request, 'main/announcement.html', context)
+def passed_test(correct_answers: int, total_questions: int) -> bool:
+    if total_questions == 0:
+        return False
+    percentage = (correct_answers / total_questions) * 100
+    return percentage >= 70
     
 
 

@@ -2,41 +2,44 @@
 
 {% load static %}
 
-{% block style %}
-<link rel="stylesheet" href="{% static 'main/css/answers.css' %}">
-{% endblock %}
-
 {% block content %}
 
+<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/answers.css' %}">
+
 <div class="card profile-card">
-    <div class="profile-info">
-      <p><strong>Филиал:</strong> Москва</p>
-      <p><strong>Должность:</strong> Инженер-программист</p>
-      <p><strong>ФИО:</strong> Иванов Иван Иванович</p>
+  <div class="profile-info">
+    <p><strong>Филиал:</strong> {{ employee.branch }}</p>
+    <p><strong>Должность:</strong> {{ employee.position }}</p>
+    <p><strong>ФИО:</strong> {{ employee.fio }}</p>
+    <p><strong>Билет:</strong> №{{ employee.card_number }}</p>
+  </div>
+</div>
+<div class="card results-card">
+  <div class="results-header">
+    <div class="score">Правильных ответов: {{ employee.score }}/{{ employee.total }}</div>
+    <div class="status">
+      {% if is_passed %}
+      Вы прошли
+      {% else %}
+      Вы не прошли
+      {% endif %}
     </div>
   </div>
-  <div class="card results-card">
-    <div class="results-header">
-      <div class="score">Правильных ответов: 7/10</div>
-      <div class="status">Вы прошли</div>
-    </div>
-    <div class="answer-card correct">
-      <h3>Вопрос 1: Какой язык программирования используется для создания стилей на веб-страницах?</h3>
-      <p><span class="label">Правильный ответ:</span> CSS</p>
-      <p><span class="label">Ваш ответ:</span> CSS</p>
-    </div>
-
-    <div class="answer-card incorrect">
-      <h3>Вопрос 2: Что такое HTML?</h3>
-      <p><span class="label">Правильный ответ:</span> Язык разметки гипертекста</p>
-      <p><span class="label">Ваш ответ:</span> Язык программирования</p>
-    </div>
-
-    <div class="answer-card correct">
-      <h3>Вопрос 3: Что делает JavaScript?</h3>
-      <p><span class="label">Правильный ответ:</span> Добавляет интерактивность на страницу</p>
-      <p><span class="label">Ваш ответ:</span> Добавляет интерактивность на страницу</p>
-    </div>
+  {% for answer in answers %}
+  {% if answer.answer == answer.correct_answer %}
+  <div class="answer-card correct">
+    <h3>{{ answer.question }}</h3>
+    <p><span class="label">Ваш ответ:</span> {{ answer.correct_answer }}</p>
   </div>
+  {% else %}
+
+  <div class="answer-card incorrect">
+    <h3>{{ answer.question }}</h3>
+    <p><span class="label">Правильный ответ:</span> {{ answer.answer }}</p>
+    <p><span class="label">Ваш ответ:</span> {{ answer.correct_answer }}</p>
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
 
 {% endblock %}

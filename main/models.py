@@ -11,9 +11,6 @@ class EmployeeUser(AbstractUser):
     date_passed = models.DateTimeField("Дата прохождения", blank=True, null=True)
     card_number = models.IntegerField("Номер билета", default=0)
     user_slug = models.CharField("Username", max_length=100, unique=True)
-
-    def __str__(self):
-        return self.fio
     
 
 class Answer(models.Model):
