@@ -1,0 +1,32 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/question.css' %}">
+
+<div class="card">
+    <h2>Билет №{{ card_number }}</h2>
+
+    <div class="question-section">
+        <p>{{ current_question.question_ru }}</p>
+    </div>
+
+    <form hx-get="{% url 'main:card' %}" hx-target="#card" hx-swap="innerHTML">
+        <div class="answers-section">
+            {% for option in options %}
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="answer" value="{{ option.id }}" />
+                    {{ option.option_ru }}
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button class="btn" type="submit">Следующий вопрос</button>
+    </form>
+</div>
+
+{% endblock %}

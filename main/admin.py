@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Employee, Answer, Card, Question, Option, Branch, Position
+from .models import EmployeeUser, Answer, Card, Question, Option, Branch, Position
 import nested_admin
 from django.core.exceptions import ValidationError
 
@@ -11,19 +11,13 @@ class PositionInline(admin.TabularInline):
 
 class OptionInline(nested_admin.NestedTabularInline):
     model = Option
-
-    def get_extra(self, request, obj=None, **kwargs):
-        if obj:
-            count = obj.options.count()
-            if count > 0:
-                return 0
-        return 4
+    extra = 4
 
 
 class QuestionInline(nested_admin.NestedTabularInline):
     model = Question
     inlines = [OptionInline]
-    extra = 0
+    extra = 1
 
 
 class CardAdmin(nested_admin.NestedModelAdmin):
@@ -46,7 +40,7 @@ class PositionAdmin(admin.ModelAdmin):
 
 
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ['branch', 'position', 'fio', 'score', 'total', 'card_number', 'date_passed']
+    list_display = ['branch', 'position', 'fio', 'score', 'total', 'card_number', 'date_passed', 'user_slug']
     list_filter = ['branch', 'fio', 'card_number', 'date_passed']
 
 
@@ -65,7 +59,7 @@ class OptionAdmin(admin.ModelAdmin):
 
 admin.site.register(Branch, BranchAdmin)
 admin.site.register(Position, PositionAdmin)
-admin.site.register(Employee, EmployeeAdmin)
+admin.site.register(EmployeeUser, EmployeeAdmin)
 admin.site.register(Answer, AnswerAdmin)
 admin.site.register(Card, CardAdmin)
 admin.site.register(Question, QuestionAdmin)

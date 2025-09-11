@@ -1,7 +1,8 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
-class Employee(models.Model):
+class EmployeeUser(AbstractUser):
     branch = models.CharField("Филиал", max_length=100, default="")
     position = models.CharField("Должность", max_length=100, default="")
     fio = models.CharField("ФИО", max_length=100, default="")
@@ -9,13 +10,14 @@ class Employee(models.Model):
     total = models.IntegerField("Всего вопросов", default=10)
     date_passed = models.DateTimeField("Дата прохождения", blank=True, null=True)
     card_number = models.IntegerField("Номер билета", default=0)
+    user_slug = models.CharField("Username", max_length=100, unique=True)
 
     def __str__(self):
         return self.fio
-
+    
 
 class Answer(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='answers')
+    employee = models.ForeignKey(EmployeeUser, on_delete=models.CASCADE, related_name='answers')
     question = models.TextField("Вопрос", default="")
     answer = models.TextField("Ответ сотрудника", default="", blank=True, null=True)
     correct_answer = models.TextField("Правильный ответ", default="")
