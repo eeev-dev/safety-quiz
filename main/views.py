@@ -7,11 +7,9 @@ from django.http import HttpResponseBadRequest, HttpRequest, HttpResponse
 from django.template.response import TemplateResponse
 from .models import EmployeeUser, Branch, Position, Card, Question, Answer, Option
 from django.contrib.auth import login, authenticate
-from slugify import slugify
 from django.contrib.auth import get_user_model
-from string import ascii_letters, digits
-from random import shuffle
 from django.db.models import F
+from .utils import unique_slugify, passed_test
 
 User = get_user_model()
 
@@ -52,26 +50,18 @@ class IndexView(TemplateView):
 
             if employees.exists():
                 employee = employees.first()
-                print(employee.user_slug)
                 user = authenticate(username=employee.user_slug, password="secure123")
                 if user is not None:
                     login(request, user)
                     if employee.card_number > 0:
-                        answers = request.user.answers.all()
-                        request.user.total = answers.count()
-                        request.user.save()
-                        correct_answers = answers.filter(answer=F('correct_answer'))
-                        context['employee'] = request.user
-                        context['answers'] = answers
-                        context['is_passed'] = passed_test(correct_answers.count(), answers.count())
+                        context['employee'] = user
+                        context['answers'] = user.answers.all()
+                        context['is_passed'] = passed_test(user.score, user.total)
                         return TemplateResponse(request, 'main/answers.html', context)
                     else:
                         return TemplateResponse(request, 'main/cards.html', context)
             else:
-                chars = list(ascii_letters + digits)
-                shuffle(chars)
-                user_slug = slugify(full_name) + ''.join(chars[:3])
-                print(user_slug)
+                user_slug = unique_slugify(full_name)
                 user = User.objects.create_user(
                     username=user_slug,
                     branch=branch.title, 
@@ -105,12 +95,16 @@ class CardsView(TemplateView):
         if (request.headers.get('HX_Request')):
             card_id = request.GET.get("id")
             card = get_object_or_404(Card, id=card_id)
+            questions = card.questions.all()
+
             request.user.card_number = card.number
+            request.user.total = questions.count()
             request.user.save()
-            question = Question.objects.filter(card=card).order_by('id').first()
+            
+            question = questions.order_by('id').first()
             context['card_number'] = card.number
             context['current_question'] = question
-            context['options'] = Option.objects.filter(question=question)
+            context['options'] = question.options.all()
             return TemplateResponse(request, 'main/questions.html', context)
     
 
@@ -150,24 +144,17 @@ class CardView(TemplateView):
                 question = questions[current_index]
                 context['card_number'] = card.number
                 context['current_question'] = question
-                context['options'] = Option.objects.filter(question=question)
+                context['options'] = question.options.all()
                 return TemplateResponse(request, 'main/questions.html', context)
             else:
                 answers = request.user.answers.all()
-                request.user.total = answers.count()
+                request.user.total = questions.count()
                 request.user.save()
                 correct_answers = answers.filter(answer=F('correct_answer'))
                 context['employee'] = request.user
                 context['answers'] = answers
                 context['is_passed'] = passed_test(correct_answers.count(), answers.count())
                 return TemplateResponse(request, 'main/answers.html', context)
-            
-
-def passed_test(correct_answers: int, total_questions: int) -> bool:
-    if total_questions == 0:
-        return False
-    percentage = (correct_answers / total_questions) * 100
-    return percentage >= 70
     
 
 

@@ -11,6 +11,7 @@
 
     <div class="question-section">
         <p>{{ current_question.question_ru }}</p>
+        <img class="image" src="{{ current_question.image }}">
     </div>
 
     <form hx-post="{% url 'main:card' %}" hx-target="#card" hx-swap="outerHTML">
