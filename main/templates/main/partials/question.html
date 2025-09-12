@@ -1,0 +1,24 @@
+<h2>Билет №{{ card_number }}</h2>
+
+<div class="question-section">
+    <p>{{ question_number }}. {{ current_question.question_ru }}</p>
+    {% if current_question.image %}
+    <img class="image" src="{{ current_question.image.url }}" alt="Изображение">
+    {% endif %}
+</div>
+
+<form hx-post="{% url 'main:card' %}" hx-target="#card" hx-swap="innerHTML">
+    {% csrf_token %}
+    <div class="answers-section">
+        {% for option in options %}
+        <div class="form-group">
+            <label>
+                <input type="radio" name="answer" value="{{ option.id }}" />
+                {{ option.option_ru }}
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+
+    <button class="btn" type="submit">Следующий вопрос</button>
+</form>

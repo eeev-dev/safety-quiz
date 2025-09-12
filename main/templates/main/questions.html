@@ -4,33 +4,116 @@
 
 {% block content %}
 
-<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/questions.css' %}">
+<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/question.css' %}">
 
-<div id="card" class="card">
-    <h2>Билет №{{ card_number }}</h2>
-
-    <div class="question-section">
-        <p>{{ question_number }}. {{ current_question.question_ru }}</p>
-        {% if current_question.image %}
-        <img class="image" src="{{ current_question.image.url }}" alt="Изображение">
-        {% endif %}
+<div class="card-container">
+    <div class="timer">
+        <div id="countdown-text" align="center">10:00</div>
+        <progress id="countdown" value="10" max="10"></progress>
     </div>
 
-    <form hx-post="{% url 'main:card' %}" hx-target="#card" hx-swap="outerHTML">
-        {% csrf_token %}
-        <div class="answers-section">
-            {% for option in options %}
-            <div class="form-group">
-                <label>
-                    <input type="radio" name="answer" value="{{ option.id }}" />
-                    {{ option.option_ru }}
-                </label>
-            </div>
-            {% endfor %}
+    <div id="card" class="card">
+        <h2>Билет №{{ card_number }}</h2>
+
+        <div class="question-section">
+            <p>{{ question_number }}. {{ current_question.question_ru }}</p>
+            {% if current_question.image %}
+            <img class="image" src="{{ current_question.image.url }}" alt="Изображение">
+            {% endif %}
         </div>
 
-        <button class="btn" type="submit">Следующий вопрос</button>
-    </form>
+        <form hx-post="{% url 'main:card' %}" hx-target="#card" hx-swap="innerHTML">
+            {% csrf_token %}
+            <div class="answers-section">
+                {% for option in options %}
+                <div class="form-group">
+                    <label>
+                        <input type="radio" name="answer" value="{{ option.id }}" />
+                        {{ option.option_ru }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button class="btn" type="submit">Следующий вопрос</button>
+        </form>
+    </div>
 </div>
+
+<script>
+    let time = 600000; // 10 минут
+    let time_progress = 10; // 10 минут
+    let minutes = 10;
+    let seconds = 0;
+    const timer = setInterval(() => {
+        const countdownElement = document.getElementById('countdown');
+        if (time > 0) {
+            time -= 1000; // прошла секунда
+            seconds--;
+            if (seconds < 0) { // прошла минута
+                minutes--;
+                seconds = 59;
+                countdownElement.value = time_progress--;
+            }
+            document.getElementById('countdown-text').textContent = formatTime(minutes) + ":" + formatTime(seconds);
+        } else {
+            clearInterval(timer);
+
+            const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+            const url = new URL("{% url 'main:card' %}", window.location.origin);
+            if (selectedAnswer) {
+                url.searchParams.append("answer", selectedAnswer.value);
+            }
+            else {
+                url.searchParams.append("question", "{{ current_question.id }}");
+            }
+
+            fetch(url.toString(), {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": getCookie("csrftoken")
+                }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Network response was not ok");
+                    return response.text();
+                })
+                .then(html => {
+                    const parser = new DOMParser();
+                    const newDoc = parser.parseFromString(html, "text/html");
+                    const newCard = newDoc.querySelector("#main-content");
+                    if (newCard) {
+                        const oldCard = document.querySelector("#main-content");
+                        oldCard.replaceWith(newCard);
+                    }
+                })
+                .catch(error => console.error("Ошибка при загрузке:", error));
+        }
+    }, 1000);
+
+    function formatTime(number) {
+        if (number < 10 && number >= 0) {
+            return 0 + '' + number
+        }
+        else return number
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
 
 {% endblock %}

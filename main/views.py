@@ -114,14 +114,61 @@ class CardView(TemplateView):
         context = super().get_context_data(**kwargs)
         return context
     
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        
+        option_id = request.GET.get('answer')
+        if option_id:
+            option = get_object_or_404(Option, id=option_id)
+            question = option.question
+            options = question.options
+            correct_option = options.filter(is_correct=True).first()
+            Answer.objects.create(
+                employee = request.user,
+                question = question.question_ru,
+                answer = option.option_ru,
+                correct_answer = correct_option.option_ru if correct_option else "Правильный ответ не указан"
+            )
+            if option == correct_option:
+                request.user.score += 1
+                request.user.save()
+        else:
+            question_id = request.GET.get('question')
+            if question_id:
+                question = get_object_or_404(Question, id=question_id)
+                card = question.card
+
+                questions = card.questions
+                answers = request.user.answers
+                answered_questions = {a.question for a in answers}
+                unanswered_questions = [q for q in questions if q.question_ru not in answered_questions]
+
+                for q in unanswered_questions:
+                    options = q.options
+                    correct_option = options.filter(is_correct=True).first()
+                    Answer.objects.create(
+                        employee = request.user,
+                        question = question.question_ru,
+                        answer = "Ответ не был выбран",
+                        correct_answer = correct_option.option_ru if correct_option else "Правильный ответ не указан"
+                    )
+
+        answers = request.user.answers.all()
+        correct_answers = answers.filter(answer=F('correct_answer'))
+        context['employee'] = request.user
+        context['answers'] = answers
+        context['is_passed'] = passed_test(correct_answers.count(), answers.count())
+        return TemplateResponse(request, 'main/answers.html', context)
+        
+    
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         if request.headers.get('HX-Request'):
             option_id = request.POST.get('answer')
+            
             option = get_object_or_404(Option, id=option_id)
             question = option.question
             card = question.card
-            
             options = Option.objects.filter(question=question)
             correct_option = options.filter(is_correct=True).first()
             Answer.objects.create(
@@ -147,16 +194,15 @@ class CardView(TemplateView):
                 context['card_number'] = card.number
                 context['current_question'] = question
                 context['options'] = question.options.all()
-                return TemplateResponse(request, 'main/questions.html', context)
+                return TemplateResponse(request, 'main/partials/question.html', context)
             else:
                 answers = request.user.answers.all()
-                request.user.total = questions.count()
-                request.user.save()
                 correct_answers = answers.filter(answer=F('correct_answer'))
                 context['employee'] = request.user
                 context['answers'] = answers
                 context['is_passed'] = passed_test(correct_answers.count(), answers.count())
                 return TemplateResponse(request, 'main/answers.html', context)
+            
     
 
 
