@@ -4,14 +4,16 @@
 
 {% block content %}
 
-<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/question.css' %}">
+<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/questions.css' %}">
 
 <div id="card" class="card">
     <h2>Билет №{{ card_number }}</h2>
 
     <div class="question-section">
-        <p>{{ current_question.question_ru }}</p>
-        <img class="image" src="{{ current_question.image }}">
+        <p>{{ question_number }}. {{ current_question.question_ru }}</p>
+        {% if current_question.image %}
+        <img class="image" src="{{ current_question.image.url }}" alt="Изображение">
+        {% endif %}
     </div>
 
     <form hx-post="{% url 'main:card' %}" hx-target="#card" hx-swap="outerHTML">

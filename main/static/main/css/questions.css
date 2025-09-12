@@ -9,8 +9,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh; /* лучше, если содержимое будет адаптивным */
-    padding: 20px; /* чтоб на маленьких экранах не прилегало к краю */
+    min-height: 100vh;
+    padding: 20px;
 }
 
 .card {
@@ -19,10 +19,10 @@ body {
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     width: 100%;
-    min-width: 350px;   /* минимальная ширина */
-    max-width: 800px;   /* максимальная ширина */
+    min-width: 350px;
+    max-width: 800px;
     box-sizing: border-box;
-    word-wrap: break-word; /* перенос длинных слов */
+    word-wrap: break-word;
 }
 
 h2 {
@@ -35,12 +35,23 @@ h2 {
     font-weight: 600;
     margin-bottom: 30px;
     font-size: 18px;
-    white-space: pre-wrap; /* чтобы переносить переводы строк и длинные тексты */
+    white-space: pre-wrap;
+}
+
+.image {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+    margin-bottom: 30px;
 }
 
 label {
     display: flex;
-    align-items: flex-start; /* для многострочного текста */
+    align-items: flex-start;
     font-weight: 600;
     color: #003366;
     cursor: pointer;
@@ -49,7 +60,7 @@ label {
     border-radius: 12px;
     background: #f9fbff;
     transition: background-color 0.3s ease, border-color 0.3s ease;
-    word-break: break-word; /* перенос слов в ответах */
+    word-break: break-word;
     margin-bottom: 20px;
 }
 
@@ -62,8 +73,8 @@ input[type="radio"] {
     margin-right: 12px;
     accent-color: #3399ff;
     cursor: pointer;
-    margin-top: 4px; /* чтобы радиокнопка была чуть ниже, если текст в несколько строк */
-    flex-shrink: 0; /* чтобы не сжималась */
+    margin-top: 4px;
+    flex-shrink: 0;
     width: 18px;
     height: 18px;
 }

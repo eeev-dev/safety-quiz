@@ -87,7 +87,7 @@ class CardsView(TemplateView):
     def get(self, request, *args, **kwargs):
         if request.headers.get('HX-Request'):
             context = self.get_context_data(**kwargs)
-            context['cards'] = Card.objects.all()
+            context['cards'] = Card.objects.all().order_by('number')
             return TemplateResponse(request, 'main/partials/card.html', context)
         
     def post(self, request: HttpRequest, *args, **kwargs):
@@ -102,6 +102,7 @@ class CardsView(TemplateView):
             request.user.save()
             
             question = questions.order_by('id').first()
+            context['question_number'] = 1
             context['card_number'] = card.number
             context['current_question'] = question
             context['options'] = question.options.all()
@@ -142,6 +143,7 @@ class CardView(TemplateView):
 
             if current_index < len(questions):
                 question = questions[current_index]
+                context['question_number'] = current_index + 1
                 context['card_number'] = card.number
                 context['current_question'] = question
                 context['options'] = question.options.all()
