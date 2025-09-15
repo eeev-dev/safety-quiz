@@ -7,7 +7,11 @@
     {% endif %}
 </div>
 
+{% if is_last_question %}
+<form hx-post="{% url 'main:card' %}" hx-target="#main-content" hx-swap="innerHTML">
+{% else %}
 <form hx-post="{% url 'main:card' %}" hx-target="#card" hx-swap="innerHTML">
+{% endif %}
     {% csrf_token %}
     <div class="answers-section">
         {% for option in options %}

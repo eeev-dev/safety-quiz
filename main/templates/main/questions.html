@@ -21,7 +21,6 @@
             <img class="image" src="{{ current_question.image.url }}" alt="Изображение">
             {% endif %}
         </div>
-
         <form hx-post="{% url 'main:card' %}" hx-target="#card" hx-swap="innerHTML">
             {% csrf_token %}
             <div class="answers-section">
