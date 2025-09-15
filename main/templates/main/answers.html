@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/answers.css' %}">
+<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/answer.css' %}">
 
 <div class="card profile-card">
   <div class="profile-info">
@@ -40,6 +40,9 @@
   </div>
   {% endif %}
   {% endfor %}
+  <form method="get" action="{% url 'main:answers' %}">
+    <button class="btn" type="submit">Скачать документ</button>
+  </form>
 </div>
 
 {% endblock %}
