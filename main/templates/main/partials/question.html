@@ -1,9 +1,11 @@
-<h2>Билет №{{ card_number }}</h2>
+{% load i18n %}
+
+<h2>{% trans "Ticket" %} №{{ card_number }}</h2>
 
 <div class="question-section">
     <p>{{ question_number }}. {{ current_question.question_ru }}</p>
     {% if current_question.image %}
-    <img class="image" src="{{ current_question.image.url }}" alt="Изображение">
+    <img class="image" src="{{ current_question.image.url }}" alt="{% trans 'Picture' %}">
     {% endif %}
 </div>
 
@@ -24,5 +26,11 @@
         {% endfor %}
     </div>
 
-    <button class="btn" type="submit">Следующий вопрос</button>
+    <button class="btn" type="submit">
+        {% if is_last_question %}
+        {% trans "Next question" %}
+        {% else %}
+        {% trans "Finish test" %}
+        {% endif %}
+    </button>
 </form>

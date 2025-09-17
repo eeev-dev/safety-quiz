@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="ru">
 
+{% load i18n %}
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> Техника безопасности </title>
+  <title> {% trans "Safety measures" %} </title>
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <meta name="csrf-token" content="{{ csrf_token }}">
   {% load static %}
   <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
   {% block style %} {% endblock %}

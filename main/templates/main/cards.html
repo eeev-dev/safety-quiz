@@ -4,10 +4,12 @@
 
 {% block content %}
 
+{% load i18n %}
+
 <link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/cards.css' %}">
 
 <div class="main-container">
-  <h2>Выберите билет</h2>
+  <h2>{% trans "Select ticket" %}</h2>
   <div class="cards-container" hx-get="{% url 'main:cards' %}" hx-trigger="load"></div>
 </div>
 

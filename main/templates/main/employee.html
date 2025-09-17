@@ -8,18 +8,22 @@
 
 {% block content %}
 
+{% load i18n %}
+
+<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/employee.css' %}">
+
 <div class="card">
-    <h2> Данные сотрудника </h2>
+    <h2> {% trans "Employee data" %} </h2>
 
     <form method="post" action="{% url 'main:index' %}" hx-post="{% url 'main:index' %}" hx-target="#main-content"
         hx-swap="innerHTML">
         {% csrf_token %}
 
         <div class="form-group">
-            <label for="branch">Филиал</label>
+            <label for="branch">{% trans "Branch" %}</label>
             <select id="branch" name="branch_id" required hx-get="{% url 'main:index' %}" hx-target="#position"
                 hx-include="#branch" hx-trigger="change" hx-swap="outerHTML">
-                <option value disabled selected>Выберите филиал</option>
+                <option value disabled selected>{% trans "Select branch" %}</option>
                 {% for branch in branches %}
                 <option value="{{ branch.id }}">{{ branch.title }}</option>
                 {% endfor %}
@@ -27,18 +31,19 @@
         </div>
 
         <div class="form-group" id="position">
-            <label for="position">Должность</label>
+            <label for="position">{% trans "Position" %}</label>
             <select name="position" required>
-                <option value disabled selected>Сначала выберите филиал</option>
+                <option value disabled selected>{% trans "First select branch" %}</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="fullName">ФИО</label>
-            <input type="text" id="fullName" name="fullName" placeholder="Введите ФИО" required>
+            <label for="fullName">{% trans "Full name" %}</label>
+            <input type="text" id="fullName" name="fullName" placeholder="{% trans 'Enter full name' %}" required>
         </div>
 
-        <button type="submit" class="btn">Перейти к выбору билета</button>
+        <button type="submit" class="btn" style="margin-bottom: 15px;">{% trans "Proceed to ticket selection" %}</button>
+        <a href="{% url 'main:language' %}" hx-get="{% url 'main:language' %}" hx-target="#main-content" hx-swap="innerHTML" class="btn">{% trans "Change language" %}</a>
     </form>
 </div>
 

@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse
 from django.shortcuts import redirect
 import json
+from django.conf import settings
 from django.http import HttpResponseBadRequest, HttpRequest, HttpResponse
 from django.template.response import TemplateResponse
 from .models import EmployeeUser, Branch, Position, Card, Question, Answer, Option
@@ -13,6 +14,7 @@ from .utils import unique_slugify, passed_test
 from docx import Document
 from django.http import FileResponse
 import io
+from django.utils import translation
 
 User = get_user_model()
 
@@ -22,7 +24,6 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
-
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
@@ -78,11 +79,37 @@ class IndexView(TemplateView):
 
                 user = authenticate(username=user_slug, password='secure123')
                 login(request, user)
-
+            
                 return TemplateResponse(request, 'main/cards.html', context)
         
         return HttpResponse('Ошибка входа')
     
+
+class LanguageView(TemplateView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+    
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(*kwargs)
+        return TemplateResponse(request, 'main/language.html', context)
+    
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(*kwargs)
+        if request.headers.get('HX-Request'):
+            lang_code = request.POST.get('lang')
+            translation.activate(lang_code)
+            request.session[settings.LANGUAGE_COOKIE_NAME] = lang_code
+
+            if request.user.is_authenticated:
+                request.user.lang_code = lang_code
+                request.user.save()
+
+            context['branches'] = Branch.objects.all()
+            response = TemplateResponse(request, 'main/employee.html', context)
+            response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
+            return response
+        
 
 class CardsView(TemplateView):
     template_name = 'main/base.html'
@@ -92,8 +119,15 @@ class CardsView(TemplateView):
         return context
     
     def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
         if request.headers.get('HX-Request'):
-            context = self.get_context_data(**kwargs)
+            lang_code = request.GET.get('lang')
+            if lang_code: 
+                request.user.lang_code = lang_code
+                request.user.save()
+                context['cards'] = Card.objects.all().order_by('number')
+                return TemplateResponse(request, 'main/cards.html', context)
+
             context['cards'] = Card.objects.all().order_by('number')
             return TemplateResponse(request, 'main/partials/card.html', context)
         
@@ -104,7 +138,7 @@ class CardsView(TemplateView):
             card = get_object_or_404(Card, id=card_id)
             questions = card.questions.order_by('id').all()
 
-            request.user.card_number = card.number
+            '''request.user.card_number = card.number
             request.user.total = questions.count()
             saved_questions = request.user.answers.values_list('question')
             for i, q in enumerate(questions):
@@ -116,13 +150,15 @@ class CardsView(TemplateView):
                         answer = "Ответ не был выбран",
                         correct_answer = correct_option.option_ru if correct_option else "Правильный ответ не указан"
                     )
-            request.user.save()
+            request.user.save()'''
 
             question = questions.first()
+            options = question.options.all()
+            context['option_id'] = options[0]
             context['question_number'] = 1
             context['card_number'] = card.number
             context['current_question'] = question
-            context['options'] = question.options.all()
+            context['options'] = options
             return TemplateResponse(request, 'main/questions.html', context)
     
 
@@ -138,7 +174,7 @@ class CardView(TemplateView):
         option = get_object_or_404(Option, id=option_id)
         question = option.question
 
-        for answer in request.user.answers.all():
+        '''for answer in request.user.answers.all():
             if answer.question[3:] == question.question_ru:
                 answer.answer = option.option_ru
                 answer.save()
@@ -147,7 +183,7 @@ class CardView(TemplateView):
                     request.user.score += 1
                     request.user.save()
 
-                break
+                break'''
 
         answers = request.user.answers.all()
         context['employee'] = request.user
@@ -164,7 +200,7 @@ class CardView(TemplateView):
             question = option.question
             card = question.card
 
-            for answer in request.user.answers.all():
+            '''for answer in request.user.answers.all():
                 if answer.question[3:] == question.question_ru:
                     answer.answer = option.option_ru
                     answer.save()
@@ -173,7 +209,7 @@ class CardView(TemplateView):
                         request.user.score += 1
                         request.user.save()
 
-                    break
+                    break'''
                 
             questions = card.questions.order_by('id')
             current_index = 0
@@ -183,22 +219,23 @@ class CardView(TemplateView):
                     break
 
             if current_index < len(questions):
+                lang_code = request.POST.get('lang')
+                if lang_code:
+                    request.user.lang_code = lang_code
+                    request.user.save()
+                    current_index -= 1
+
+                options = question.options.all()
                 context['is_last_question'] = False
                 if current_index + 1 == len(questions):
                     context['is_last_question'] = True
                 question = questions[current_index]
+                context['option_id'] = options[0]
                 context['question_number'] = current_index + 1
                 context['card_number'] = card.number
                 context['current_question'] = question
-                context['options'] = question.options.all()
+                context['options'] = options
                 return TemplateResponse(request, 'main/partials/question.html', context)
-            else:
-                answers = request.user.answers.all()
-                correct_answers = answers.filter(answer=F('correct_answer'))
-                context['employee'] = request.user
-                context['answers'] = answers
-                context['is_passed'] = passed_test(correct_answers.count(), answers.count())
-                return TemplateResponse(request, 'main/answers.html', context)
             
     
 class AnswersView(TemplateView):
@@ -232,4 +269,5 @@ class AnswersView(TemplateView):
         filename = f"Результаты_{user.fio.replace(' ', '_')}.docx"
         response = FileResponse(buffer, as_attachment=True, filename=filename)
         return response
+            
 

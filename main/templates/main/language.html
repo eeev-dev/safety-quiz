@@ -1,0 +1,31 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/language.css' %}">
+
+<div class="card">
+  <h2>Выбор языка | Тил тандоо</h2>
+
+  <form method="post"
+        action="{% url 'main:language' %}"
+        hx-post="{% url 'main:language' %}"
+        hx-target="#main-content"
+        hx-swap="innerHTML"
+        class="lang-form">
+    {% csrf_token %}
+    
+    <button type="submit" name="lang" value="ru" class="lang-btn">
+      <img src="{% static 'main/img/flag-ru.png' %}" alt="Русский">
+    </button>
+
+    <button type="submit" name="lang" value="kg" class="lang-btn">
+      <img src="{% static 'main/img/flag-kg.png' %}" alt="Кыргыз тили">
+    </button>
+  </form>
+</div>
+
+
+{% endblock %}

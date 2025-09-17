@@ -1,5 +1,7 @@
+{% load i18n %}
+
 <div class="form-group" id="position">
-    <label for="position">Должность</label>
+    <label for="position">{% trans "Position" %}</label>
     <select name="position" required>
         {% for position in positions %}
             <option value="{{ position.title }}">{{ position.title }}</option>

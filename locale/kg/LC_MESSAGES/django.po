@@ -1,0 +1,67 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: kg\n"
+
+msgid "Safety measures"
+msgstr "Коопсуздук чаралары"
+
+msgid "Branch"
+msgstr "Филиал"
+
+msgid "Position"
+msgstr "Кызматы"
+
+msgid "Ticket"
+msgstr "Билет"
+
+msgid "Number of correct answers"
+msgstr "Туура жооптордун саны"
+
+msgid "You have passed"
+msgstr "Сиз өттүңүз"
+
+msgid "You have not passed"
+msgstr "Сиз өткөн жоксуз"
+
+msgid "Correct answer"
+msgstr "Туура жооп"
+
+msgid "Your answer"
+msgstr "Сиздин жообуңуз"
+
+msgid "Download document"
+msgstr "Документти жүктөп алуу"
+
+msgid "Select ticket"
+msgstr "Билетти тандаңыз"
+
+msgid "Employee data"
+msgstr "Кызматкер жөнүндө маалымат"
+
+msgid "Select branch"
+msgstr "Филиалды тандаңыз"
+
+msgid "First select branch"
+msgstr "Адегенде филиалды тандаңыз"
+
+msgid "Full name"
+msgstr "Толук аты-жөнү"
+
+msgid "Proceed to ticket selection"
+msgstr "Билет тандоого өтүү"
+
+msgid "Change language"
+msgstr "Изменить язык"
+
+msgid "Enter full name"
+msgstr "Толук аты-жөнүңүздү киргизиңиз"
+
+msgid "Picture"
+msgstr "Сүрөт"
+
+msgid "Next question"
+msgstr "Кийинки суроо"
+
+msgid "Finish test"
+msgstr "Тестти аяктоо"

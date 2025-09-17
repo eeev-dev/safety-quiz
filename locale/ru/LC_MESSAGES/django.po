@@ -1,0 +1,67 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ru\\n"
+
+msgid "Safety measures"
+msgstr "Техника безопасности"
+
+msgid "Branch"
+msgstr "Филиал"
+
+msgid "Position"
+msgstr "Должность"
+
+msgid "Ticket"
+msgstr "Билет"
+
+msgid "Number of correct answers"
+msgstr "Правильных ответов"
+
+msgid "You have passed"
+msgstr "Вы прошли"
+
+msgid "You have not passed"
+msgstr "Вы не прошли"
+
+msgid "Correct answer"
+msgstr "Правильный ответ"
+
+msgid "Your answer"
+msgstr "Ваш ответ"
+
+msgid "Download document"
+msgstr "Скачать документ"
+
+msgid "Select ticket"
+msgstr "Выберите билет"
+
+msgid "Employee data"
+msgstr "Данные сотрудника"
+
+msgid "Select branch"
+msgstr "Выберите филиал"
+
+msgid "First select branch"
+msgstr "Сначала выберите филиал"
+
+msgid "Full name"
+msgstr "ФИО"
+
+msgid "Proceed to ticket selection"
+msgstr "Перейти к билетам"
+
+msgid "Change language"
+msgstr "Тилди өзгөртүү"
+
+msgid "Enter full name"
+msgstr "Введите ФИО"
+
+msgid "Picture"
+msgstr "Изображение"
+
+msgid "Next question"
+msgstr "Следующий вопрос"
+
+msgid "Finish test"
+msgstr "Завершить тест"

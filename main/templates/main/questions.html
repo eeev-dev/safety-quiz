@@ -4,6 +4,8 @@
 
 {% block content %}
 
+{% load i18n %}
+
 <link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/question.css' %}">
 
 <div class="card-container">
@@ -13,12 +15,12 @@
     </div>
 
     <div id="card" class="card">
-        <h2>Билет №{{ card_number }}</h2>
+        <h2>{% trans "Ticket" %} №{{ card_number }}</h2>
 
         <div class="question-section">
             <p>{{ question_number }}. {{ current_question.question_ru }}</p>
             {% if current_question.image %}
-            <img class="image" src="{{ current_question.image.url }}" alt="Изображение">
+            <img class="image" src="{{ current_question.image.url }}" alt="{% trans 'Picture' %}">
             {% endif %}
         </div>
         <form hx-post="{% url 'main:card' %}" hx-target="#card" hx-swap="innerHTML">
@@ -34,7 +36,7 @@
                 {% endfor %}
             </div>
 
-            <button class="btn" type="submit">Следующий вопрос</button>
+            <button class="btn" type="submit">{% trans "Next question" %}</button>
         </form>
     </div>
 </div>

@@ -4,24 +4,26 @@
 
 {% block content %}
 
+{% load i18n %}
+
 <link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/answer.css' %}">
 
 <div class="card profile-card">
   <div class="profile-info">
-    <p><strong>Филиал:</strong> {{ employee.branch }}</p>
-    <p><strong>Должность:</strong> {{ employee.position }}</p>
-    <p><strong>ФИО:</strong> {{ employee.fio }}</p>
-    <p><strong>Билет:</strong> №{{ employee.card_number }}</p>
+    <p><strong>{% trans "Branch" %}:</strong> {{ employee.branch }}</p>
+    <p><strong>{% trans "Position" %}:</strong> {{ employee.position }}</p>
+    <p><strong>{% trans "Full name" %}:</strong> {{ employee.fio }}</p>
+    <p><strong>{% trans "Ticket" %}:</strong> №{{ employee.card_number }}</p>
   </div>
 </div>
 <div class="card results-card">
   <div class="results-header">
-    <div class="score">Правильных ответов: {{ employee.score }}/{{ employee.total }}</div>
+    <div class="score">{% trans "Number of correct answers" %}: {{ employee.score }}/{{ employee.total }}</div>
     <div class="status">
       {% if is_passed %}
-      Вы прошли
+      {% trans "You have passed" %}
       {% else %}
-      Вы не прошли
+      {% trans "You have not passed" %}
       {% endif %}
     </div>
   </div>
@@ -29,19 +31,19 @@
   {% if answer.answer == answer.correct_answer %}
   <div class="answer-card correct">
     <h3>{{ answer.question }}</h3>
-    <p><span class="label">Правильный ответ:</span> {{ answer.correct_answer }}</p>
+    <p><span class="label">{% trans "Correct answer" %}:</span> {{ answer.correct_answer }}</p>
   </div>
   {% else %}
 
   <div class="answer-card incorrect">
     <h3>{{ answer.question }}</h3>
-    <p><span class="label">Правильный ответ:</span> {{ answer.correct_answer }}</p>
-    <p><span class="label">Ваш ответ:</span> {{ answer.answer }}</p>
+    <p><span class="label">{% trans "Correct answer" %}:</span> {{ answer.correct_answer }}</p>
+    <p><span class="label">{% trans "Your answer" %}:</span> {{ answer.answer }}</p>
   </div>
   {% endif %}
   {% endfor %}
   <form method="get" action="{% url 'main:answers' %}">
-    <button class="btn" type="submit">Скачать документ</button>
+    <button class="btn" type="submit">{% trans "Download document" %}</button>
   </form>
 </div>
 

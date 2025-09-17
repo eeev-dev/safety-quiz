@@ -13,3 +13,4 @@ def passed_test(correct_answers: int, total_questions: int) -> bool:
         return False
     percentage = (correct_answers / total_questions) * 100
     return percentage >= 70
+
