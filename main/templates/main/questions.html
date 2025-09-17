@@ -18,7 +18,7 @@
         <h2>{% trans "Ticket" %} №{{ card_number }}</h2>
 
         <div class="question-section">
-            <p>{{ question_number }}. {{ current_question.question_ru }}</p>
+            <p>{{ question_number }}. {{ current_question.question }}</p>
             {% if current_question.image %}
             <img class="image" src="{{ current_question.image.url }}" alt="{% trans 'Picture' %}">
             {% endif %}
@@ -30,7 +30,7 @@
                 <div class="form-group">
                     <label>
                         <input type="radio" name="answer" value="{{ option.id }}" />
-                        {{ option.option_ru }}
+                        {{ option.option }}
                     </label>
                 </div>
                 {% endfor %}
