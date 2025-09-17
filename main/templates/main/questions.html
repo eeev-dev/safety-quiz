@@ -11,7 +11,7 @@
 <div class="card-container">
     <div class="timer">
         <div id="countdown-text" align="center">10:00</div>
-        <progress id="countdown" value="10" max="10"></progress>
+        <progress id="countdown" value="600000" max="600000"></progress>
     </div>
 
     <div id="card" class="card">
@@ -43,7 +43,7 @@
 
 <script>
     let time = 600000; // 10 минут
-    let time_progress = 10; // 10 минут
+    let time_progress = 600000; // 10 минут
     let minutes = 10;
     let seconds = 0;
     const timer = setInterval(() => {
@@ -54,8 +54,8 @@
             if (seconds < 0) { // прошла минута
                 minutes--;
                 seconds = 59;
-                countdownElement.value = time_progress--;
             }
+            countdownElement.value = time;
             document.getElementById('countdown-text').textContent = formatTime(minutes) + ":" + formatTime(seconds);
         } else {
             clearInterval(timer);
@@ -64,9 +64,6 @@
             const url = new URL("{% url 'main:card' %}", window.location.origin);
             if (selectedAnswer) {
                 url.searchParams.append("answer", selectedAnswer.value);
-            }
-            else {
-                url.searchParams.append("question", "{{ current_question.id }}");
             }
 
             fetch(url.toString(), {

@@ -183,11 +183,10 @@ class CardView(TemplateView):
     
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        if request.headers.get('HX-Request'):
-            option_id = request.GET.get('answer')
+        option_id = request.GET.get('answer')
+        if option_id:
             option = get_object_or_404(Option, id=option_id)
             question = option.question
-
             if request.user.lang_code == 'ru':
                 for answer in request.user.answers.all():
                     if answer.question[3:] == question.question_ru:
@@ -211,11 +210,11 @@ class CardView(TemplateView):
 
                         break
 
-            answers = request.user.answers.all()
-            context['employee'] = request.user
-            context['answers'] = answers
-            context['is_passed'] = passed_test(request.user.score, answers.count())
-            return TemplateResponse(request, 'main/answers.html', context)
+        answers = request.user.answers.all()
+        context['employee'] = request.user
+        context['answers'] = answers
+        context['is_passed'] = passed_test(request.user.score, answers.count())
+        return TemplateResponse(request, 'main/answers.html', context)
         
     
     def post(self, request, *args, **kwargs):
