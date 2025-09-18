@@ -65,3 +65,6 @@ msgstr "Следующий вопрос"
 
 msgid "Finish test"
 msgstr "Завершить тест"
+
+msgid "Date"
+msgstr "Дата прохождения"

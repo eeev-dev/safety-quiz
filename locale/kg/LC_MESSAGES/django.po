@@ -65,3 +65,6 @@ msgstr "Кийинки суроо"
 
 msgid "Finish test"
 msgstr "Тестти аяктоо"
+
+msgid "Date"
+msgstr "Өткөн күнү"

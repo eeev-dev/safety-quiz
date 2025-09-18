@@ -28,9 +28,9 @@
 
     <button class="btn" type="submit">
         {% if is_last_question %}
-        {% trans "Next question" %}
-        {% else %}
         {% trans "Finish test" %}
+        {% else %}
+        {% trans "Next question" %}
         {% endif %}
     </button>
 </form>

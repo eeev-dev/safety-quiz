@@ -14,6 +14,7 @@ from .utils import unique_slugify, passed_test, serialize_question, serialize_op
 from docx import Document
 from django.http import FileResponse
 import io
+from datetime import datetime
 from django.utils import translation
 
 User = get_user_model()
@@ -144,6 +145,7 @@ class CardsView(TemplateView):
             card = get_object_or_404(Card, id=card_id)
             questions = card.questions.order_by('id').all()
 
+            request.user.date_passed = datetime.now()
             request.user.card_number = card.number
             request.user.total = questions.count()
             saved_questions = request.user.answers.values_list('question')
@@ -294,6 +296,7 @@ class AnswersView(TemplateView):
             doc.add_paragraph(f'Должность: {user.position}')
             doc.add_paragraph(f'Билет: №{user.card_number}')
             doc.add_paragraph(f'Правильных ответов: {user.score} из {user.total}')
+            doc.add_paragraph(f'Дата прохождения: {user.date_passed.strftime('%d.%m.%Y %H.%M')}')
 
             doc.add_heading('Ответы на вопросы', level=1)
             for answer in answers:
@@ -316,6 +319,7 @@ class AnswersView(TemplateView):
             doc.add_paragraph(f'Кызматы: {user.position}')
             doc.add_paragraph(f'Билет: №{user.card_number}')
             doc.add_paragraph(f'Туура жооптордун саны: {user.score} / {user.total}')
+            doc.add_paragraph(f'Өткөн күнү: {user.date_passed.strftime('%d.%m.%Y %H.%M')}')
 
             doc.add_heading('Суроолорго берилген жооптор', level=1)
             for answer in answers:
