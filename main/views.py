@@ -34,7 +34,8 @@ class IndexView(TemplateView):
         branch_id = request.GET.get("branch_id")
         if branch_id and request.headers.get("HX-Request"):
             positions = Position.objects.filter(branch_id=branch_id)
-            return TemplateResponse(request, 'main/partials/position_options.html', {'positions': positions})
+            context['positions'] = positions
+            return TemplateResponse(request, 'main/partials/position_options.html', context)
 
         response = TemplateResponse(request, 'main/employee.html', context)
         
@@ -82,8 +83,8 @@ class IndexView(TemplateView):
                 user_slug = unique_slugify(full_name)
                 user = User.objects.create_user(
                     username=user_slug,
-                    branch=branch.title, 
-                    position=position, 
+                    branch=branch.title,
+                    position=position,
                     fio=full_name,
                     user_slug=user_slug
                 )
@@ -98,8 +99,6 @@ class IndexView(TemplateView):
                 login(request, user)
             
                 return TemplateResponse(request, 'main/cards.html', context)
-        
-        return HttpResponse('Ошибка входа')
     
 
 class LanguageView(TemplateView):
@@ -117,9 +116,8 @@ class LanguageView(TemplateView):
             lang_code = request.POST.get('lang')
             translation.activate(lang_code)
             request.session[settings.LANGUAGE_COOKIE_NAME] = lang_code
+
             context['branches'] = Branch.objects.all()
-            
-            request.session[settings.LANGUAGE_COOKIE_NAME] = lang_code
             response = TemplateResponse(request, 'main/employee.html', context)
             response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
             return response
@@ -170,7 +168,6 @@ class CardsView(TemplateView):
 
             question = questions.first()
             options = question.options.all()
-            context['option_id'] = options[0]
             context['question_number'] = 1
             context['card_number'] = card.number
             context['current_question'] = serialize_question(question, request.user.lang_code)

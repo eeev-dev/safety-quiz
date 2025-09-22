@@ -11,13 +11,31 @@ class PositionInline(admin.TabularInline):
 
 class OptionInline(nested_admin.NestedTabularInline):
     model = Option
-    extra = 4
+    extra = 0
 
 
 class QuestionInline(nested_admin.NestedTabularInline):
     model = Question
     inlines = [OptionInline]
-    extra = 1
+    extra = 0
+
+
+class AnswerInline(admin.TabularInline):
+    model = Answer
+    extra = 0
+    can_delete = False
+    show_change_link = False
+    readonly_fields = ['question', 'correct_answer', 'answer', "is_correct"]
+    max_num = 0
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+    
+    def is_correct(self, obj):
+        return obj.answer == obj.correct_answer
 
 
 class CardAdmin(nested_admin.NestedModelAdmin):
@@ -35,32 +53,17 @@ class BranchAdmin(admin.ModelAdmin):
     inlines = [PositionInline]
 
 
-class PositionAdmin(admin.ModelAdmin):
-    list_display = ['title']
-
-
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ['branch', 'position', 'fio', 'score', 'total', 'card_number', 'date_passed', 'user_slug']
-    list_filter = ['branch', 'fio', 'card_number', 'date_passed']
+    fields = ['branch', 'position', 'fio', 'score', 'total', 'card_number', 'date_passed']
+    list_display = ['branch', 'position', 'fio', 'score', 'total', 'card_number', 'date_passed']
+    list_filter = ['branch', 'date_passed']
+    search_fields = ['fio']
+    inlines = [AnswerInline]
 
-
-class AnswerAdmin(admin.ModelAdmin):
-    list_display = ['employee', 'question', 'answer', 'correct_answer']
-
-
-class QuestionAdmin(admin.ModelAdmin):
-    list_display = ['question_ru', 'question_kg', 'image']
-    inlines = [OptionInline]
-
-
-class OptionAdmin(admin.ModelAdmin):
-    list_display = ['option_ru', 'option_kg', 'is_correct']
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(Branch, BranchAdmin)
-admin.site.register(Position, PositionAdmin)
 admin.site.register(EmployeeUser, EmployeeAdmin)
-admin.site.register(Answer, AnswerAdmin)
 admin.site.register(Card, CardAdmin)
-admin.site.register(Question, QuestionAdmin)
-admin.site.register(Option, OptionAdmin)

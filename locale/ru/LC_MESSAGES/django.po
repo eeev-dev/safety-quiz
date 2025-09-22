@@ -4,7 +4,7 @@ msgstr ""
 "Language: ru\\n"
 
 msgid "Safety measures"
-msgstr "Техника безопасности"
+msgstr "ТБиПБ"
 
 msgid "Branch"
 msgstr "Филиал"

@@ -12,6 +12,13 @@ class EmployeeUser(AbstractUser):
     card_number = models.IntegerField("Номер билета", default=0)
     user_slug = models.CharField("Username", max_length=100, unique=True)
     lang_code = models.CharField("Язык", max_length=3, default='ru')
+
+    def __str__(self):
+        return self.fio
+    
+    class Meta:
+        verbose_name = "сотрудника"
+        verbose_name_plural = "Сотрудники"
     
 
 class Answer(models.Model):
@@ -22,6 +29,10 @@ class Answer(models.Model):
 
     def __str__(self):
         return self.answer
+    
+    class Meta:
+        verbose_name = "ответ"
+        verbose_name_plural = "Ответы"
 
 
 class Card(models.Model):
@@ -29,6 +40,10 @@ class Card(models.Model):
 
     def __str__(self):
         return f'Билет №{self.number}'
+    
+    class Meta:
+        verbose_name = "билет"
+        verbose_name_plural = "Билеты"
 
 
 class Question(models.Model):
@@ -39,6 +54,10 @@ class Question(models.Model):
 
     def __str__(self):
         return self.question_ru
+    
+    class Meta:
+        verbose_name = "вопрос"
+        verbose_name_plural = "Вопросы"
 
 
 class Option(models.Model):
@@ -49,6 +68,10 @@ class Option(models.Model):
 
     def __str__(self):
         return self.option_ru
+    
+    class Meta:
+        verbose_name = "вариант ответа"
+        verbose_name_plural = "Варианты ответа"
 
 
 class Branch(models.Model):
@@ -56,6 +79,10 @@ class Branch(models.Model):
 
     def __str__(self):
         return self.title
+    
+    class Meta:
+        verbose_name = "филиал"
+        verbose_name_plural = "Филиалы"
 
 
 class Position(models.Model):
@@ -64,3 +91,7 @@ class Position(models.Model):
 
     def __str__(self):
         return self.title
+    
+    class Meta:
+        verbose_name = "должность"
+        verbose_name_plural = "Должности"
