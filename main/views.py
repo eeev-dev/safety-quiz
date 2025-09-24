@@ -6,7 +6,7 @@ import json
 from django.conf import settings
 from django.http import HttpResponseBadRequest, HttpRequest, HttpResponse
 from django.template.response import TemplateResponse
-from .models import EmployeeUser, Branch, Position, Card, Question, Answer, Option
+from .models import EmployeeUser, Branch, Position, Question, Answer, Option
 from django.contrib.auth import login, authenticate
 from django.contrib.auth import get_user_model
 from django.db.models import F
@@ -72,13 +72,13 @@ class IndexView(TemplateView):
                     if lang_code:
                         user.lang_code = lang_code
                         user.save()
-                    if employee.card_number > 0:
+                    if employee.tries > 0:
+                        return TemplateResponse(request, 'main/cards.html', context)
+                    else:
                         context['employee'] = user
                         context['answers'] = user.answers.all()
                         context['is_passed'] = passed_test(user.score, user.total)
-                        return TemplateResponse(request, 'main/answers.html', context)
-                    else:
-                        return TemplateResponse(request, 'main/cards.html', context)
+                        return TemplateResponse(request, 'main/answers.html', context)  
             else:
                 user_slug = unique_slugify(full_name)
                 user = User.objects.create_user(
@@ -123,7 +123,7 @@ class LanguageView(TemplateView):
             return response
         
 
-class CardsView(TemplateView):
+'''class CardsView(TemplateView):
     template_name = 'main/base.html'
 
     def get_context_data(self, **kwargs):
@@ -172,7 +172,7 @@ class CardsView(TemplateView):
             context['card_number'] = card.number
             context['current_question'] = serialize_question(question, request.user.lang_code)
             context['options'] = serialize_options(options, request.user.lang_code)
-            return TemplateResponse(request, 'main/questions.html', context)
+            return TemplateResponse(request, 'main/questions.html', context)'''
     
 
 class CardView(TemplateView):
@@ -216,13 +216,13 @@ class CardView(TemplateView):
         return TemplateResponse(request, 'main/answers.html', context)
         
     
-    def post(self, request, *args, **kwargs):
+    '''def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         if request.headers.get('HX-Request'):
             option_id = request.POST.get('answer')
             option = get_object_or_404(Option, id=option_id)
             question = option.question
-            card = question.card
+            # card = question.card
 
             if request.user.lang_code == 'ru':
                 for answer in request.user.answers.all():
@@ -260,7 +260,7 @@ class CardView(TemplateView):
                     context['is_last_question'] = True
                 question = questions[current_index]
                 context['question_number'] = current_index + 1
-                context['card_number'] = card.number
+                # context['card_number'] = card.number
                 context['current_question'] = serialize_question(question, request.user.lang_code)
                 context['options'] = serialize_options(question.options.all(), request.user.lang_code)
                 return TemplateResponse(request, 'main/partials/question.html', context)
@@ -271,7 +271,7 @@ class CardView(TemplateView):
                 context['answers'] = answers
                 context['is_passed'] = passed_test(correct_answers.count(), answers.count())
                 return TemplateResponse(request, 'main/answers.html', context)
-
+'''
             
     
 class AnswersView(TemplateView):
@@ -291,9 +291,9 @@ class AnswersView(TemplateView):
             doc.add_paragraph(f'ФИО: {user.fio}')
             doc.add_paragraph(f'Филиал: {user.branch}')
             doc.add_paragraph(f'Должность: {user.position}')
-            doc.add_paragraph(f'Билет: №{user.card_number}')
+            # doc.add_paragraph(f'Билет: №{user.card_number}')
             doc.add_paragraph(f'Правильных ответов: {user.score} из {user.total}')
-            doc.add_paragraph(f'Дата прохождения: {user.date_passed.strftime('%d.%m.%Y %H.%M')}')
+            doc.add_paragraph(f'Дата прохождения: {user.last_date_passed.strftime('%d.%m.%Y %H.%M')}')
 
             doc.add_heading('Ответы на вопросы', level=1)
             for answer in answers:
@@ -314,9 +314,9 @@ class AnswersView(TemplateView):
             doc.add_paragraph(f'Толук аты-жөнү: {user.fio}')
             doc.add_paragraph(f'Филиал: {user.branch}')
             doc.add_paragraph(f'Кызматы: {user.position}')
-            doc.add_paragraph(f'Билет: №{user.card_number}')
+            # doc.add_paragraph(f'Билет: №{user.card_number}')
             doc.add_paragraph(f'Туура жооптордун саны: {user.score} / {user.total}')
-            doc.add_paragraph(f'Өткөн күнү: {user.date_passed.strftime('%d.%m.%Y %H.%M')}')
+            doc.add_paragraph(f'Өткөн күнү: {user.last_date_passed.strftime('%d.%m.%Y %H.%M')}')
 
             doc.add_heading('Суроолорго берилген жооптор', level=1)
             for answer in answers:

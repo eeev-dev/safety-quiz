@@ -6,10 +6,11 @@ class EmployeeUser(AbstractUser):
     branch = models.CharField("Филиал", max_length=100, default="")
     position = models.CharField("Должность", max_length=100, default="")
     fio = models.CharField("ФИО", max_length=100, default="")
+    number = models.CharField("Табельный номер", max_length=10, unique=True)
+    tries = models.IntegerField("Попыток сдачи", default=2)
     score = models.IntegerField("Результат", default=0)
     total = models.IntegerField("Всего вопросов", default=10)
-    date_passed = models.DateTimeField("Дата прохождения", blank=True, null=True)
-    card_number = models.IntegerField("Номер билета", default=0)
+    last_date_passed = models.DateTimeField("Последняя попытка прохождения теста", blank=True, null=True)
     user_slug = models.CharField("Username", max_length=100, unique=True)
     lang_code = models.CharField("Язык", max_length=3, default='ru')
 
@@ -26,6 +27,7 @@ class Answer(models.Model):
     question = models.TextField("Вопрос", default="")
     answer = models.TextField("Ответ сотрудника", default="", blank=True, null=True)
     correct_answer = models.TextField("Правильный ответ", default="")
+    date_passed = models.DateTimeField("Дата прохождения", blank=True, null=True)
 
     def __str__(self):
         return self.answer
@@ -35,19 +37,31 @@ class Answer(models.Model):
         verbose_name_plural = "Ответы"
 
 
-class Card(models.Model):
-    number = models.IntegerField("Номер билета", default=0, unique=True)
+class Section(models.Model):
+    title = models.CharField("Раздел", max_length=100, default="")
 
     def __str__(self):
-        return f'Билет №{self.number}'
+        return self.title
     
     class Meta:
-        verbose_name = "билет"
-        verbose_name_plural = "Билеты"
+        verbose_name = "раздел"
+        verbose_name_plural = "Разделы"
+
+
+class Category(models.Model):
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='categories')
+    title = models.CharField("Категория", max_length=100, default="")
+    
+    def __str__(self):
+        return f"{self.title} ({self.section.title})"
+    
+    class Meta:
+        verbose_name = "категория сотрудников"
+        verbose_name_plural = "Категория сотрудников"
 
 
 class Question(models.Model):
-    card = models.ForeignKey(Card, on_delete=models.CASCADE, related_name='questions')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, related_name='questions') 
     question_ru = models.TextField("Вопрос на русском", default="")
     question_kg = models.TextField("Вопрос на кыргызском", default="", blank=True, null=True)
     image = models.ImageField(upload_to='questions/', blank=True, null=True)
