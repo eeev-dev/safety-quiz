@@ -1,5 +1,9 @@
 from django.urls import path
-from .views import IndexView, CardView, AnswersView, LanguageView, TestEntryView, QuestionView
+from .views.employee import IndexView
+from .views.language import LanguageView
+from .views.test_entry import TestEntryView
+from .views.questions import QuestionView
+from .views.answers import AnswersView
 from django.conf import settings
 from django.conf.urls.static import static
 
