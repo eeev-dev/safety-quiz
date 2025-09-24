@@ -14,31 +14,32 @@
         <progress id="countdown" value="600000" max="600000"></progress>
     </div>
 
-    <div id="card" class="card">
-        <h2>{% trans "Ticket" %} №{{ card_number }}</h2>
+    <form method="post" action="{% url 'questions' %}" hx-post="{% url 'main:questions' %}" hx-target="#main-content" hx-swap="innerHTML">
+        {% csrf_token %}
+        {% for question in questions %}
+        <div class="card">
+            <div class="question-section">
+                <p>{{ question.question }}</p>
+                {% if question.image %}
+                <img class="image" src="{{ question.image.url }}" alt="{% trans 'Picture' %}">
+                {% endif %}
+            </div>
 
-        <div class="question-section">
-            <p>{{ question_number }}. {{ current_question.question }}</p>
-            {% if current_question.image %}
-            <img class="image" src="{{ current_question.image.url }}" alt="{% trans 'Picture' %}">
-            {% endif %}
-        </div>
-        <form hx-post="{% url 'main:card' %}" hx-target="#card" hx-swap="innerHTML">
-            {% csrf_token %}
             <div class="answers-section">
-                {% for option in options %}
+                {% for option in question.options.all %}
                 <div class="form-group">
                     <label>
-                        <input type="radio" name="answer" value="{{ option.id }}" />
+                        <input type="radio" name="answer_{{ question.id }}" value="{{ option.id }}" />
                         {{ option.option }}
                     </label>
                 </div>
                 {% endfor %}
             </div>
+        </div>
+        {% endfor %}
 
-            <button class="btn" type="submit">{% trans "Next question" %}</button>
-        </form>
-    </div>
+        <button class="btn" type="submit">{% trans "Submit all answers" %}</button>
+    </form>
 </div>
 
 <script>

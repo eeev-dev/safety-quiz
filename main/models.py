@@ -11,7 +11,6 @@ class EmployeeUser(AbstractUser):
     score = models.IntegerField("Результат", default=0)
     total = models.IntegerField("Всего вопросов", default=10)
     last_date_passed = models.DateTimeField("Последняя попытка прохождения теста", blank=True, null=True)
-    user_slug = models.CharField("Username", max_length=100, unique=True)
     lang_code = models.CharField("Язык", max_length=3, default='ru')
 
     def __str__(self):

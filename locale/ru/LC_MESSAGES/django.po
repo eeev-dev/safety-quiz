@@ -3,8 +3,35 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language: ru\\n"
 
+msgid "Test"
+msgstr "Предмет тестирования"
+
+msgid "Section"
+msgstr "Раздел"
+
+msgid "Select section"
+msgstr "Выбрать раздел"
+
+msgid "First select section"
+msgstr "Сначала выберите раздел"
+
+msgid "Category"
+msgstr "Категория сотрудников"
+
+msgid "Proceed to test"
+msgstr "Перейти к экзамену"
+
+msgid "Tabel number"
+msgstr "Табельный номер"
+
+msgid "Enter tabel number"
+msgstr "Введите табельный номер"
+
+msgid "Next"
+msgstr "Далее"
+
 msgid "Safety measures"
-msgstr "ТБиПБ"
+msgstr "ОТБиПБ"
 
 msgid "Branch"
 msgstr "Филиал"

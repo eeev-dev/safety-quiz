@@ -6,7 +6,7 @@ import json
 from django.conf import settings
 from django.http import HttpResponseBadRequest, HttpRequest, HttpResponse
 from django.template.response import TemplateResponse
-from .models import EmployeeUser, Branch, Position, Question, Answer, Option
+from .models import EmployeeUser, Branch, Position, Question, Answer, Option, Category, Section
 from django.contrib.auth import login, authenticate
 from django.contrib.auth import get_user_model
 from django.db.models import F
@@ -16,6 +16,7 @@ from django.http import FileResponse
 import io
 from datetime import datetime
 from django.utils import translation
+import random
 
 User = get_user_model()
 
@@ -36,6 +37,14 @@ class IndexView(TemplateView):
             positions = Position.objects.filter(branch_id=branch_id)
             context['positions'] = positions
             return TemplateResponse(request, 'main/partials/position_options.html', context)
+        
+        tabel_number = request.GET.get('number')
+        if tabel_number:
+            employee = EmployeeUser.objects.filter(number=tabel_number).first()
+            if employee:
+                return JsonResponse({'full_name': employee.fio})
+            else:
+                return JsonResponse({'full_name': 'Сотрудник с таким табельным номером не найден'})
 
         response = TemplateResponse(request, 'main/employee.html', context)
         
@@ -55,50 +64,66 @@ class IndexView(TemplateView):
             branch_id = request.POST.get('branch_id')
             position = request.POST.get('position')
             full_name = request.POST.get('fullName')
+            number = request.POST.get('number')
 
-            branch = get_object_or_404(Branch, id=branch_id)
-            employees = EmployeeUser.objects.filter(
-                fio__icontains=full_name,
-                branch=branch,
-                position__icontains=position
-            )
+            if full_name != 'Сотрудник с таким табельным номером не найден':
+                branch = get_object_or_404(Branch, id=branch_id)
+                employee = EmployeeUser.objects.filter(number__icontains=number).first()
 
-            if employees.exists():
-                employee = employees.first()
-                user = authenticate(username=employee.user_slug, password="secure123")
+                user = authenticate(username=employee.username, password="secure123")
                 if user is not None:
                     login(request, user)
+                    
                     lang_code = request.COOKIES.get('django_language')
                     if lang_code:
                         user.lang_code = lang_code
                         user.save()
-                    if employee.tries > 0:
-                        return TemplateResponse(request, 'main/cards.html', context)
-                    else:
-                        context['employee'] = user
-                        context['answers'] = user.answers.all()
-                        context['is_passed'] = passed_test(user.score, user.total)
-                        return TemplateResponse(request, 'main/answers.html', context)  
+                    
+                    user.branch = branch.title
+                    user.position = position
+                    user.save()
+                else:
+                    user_slug = unique_slugify(full_name)
+
+                    employee.username = user_slug
+                    employee.branch = branch.title
+                    employee.position = position
+
+                    lang_code = request.COOKIES.get('django_language')
+                    if lang_code:
+                        employee.lang_code = lang_code
+                    employee.set_password('secure123')
+                    employee.save()
+
+                    user = authenticate(username=user_slug, password='secure123')
+                    login(request, user)
+
+                if user.tries > 0:
+                    context['sections'] = Section.objects.all()
+                    context['categories'] = Category.objects.none()
+                    return TemplateResponse(request, 'main/test_entry.html', context)
+                else:
+                    context['employee'] = user
+                    context['answers'] = user.answers.all()
+                    context['is_passed'] = passed_test(user.score, user.total)
+                    return TemplateResponse(request, 'main/answers.html', context)
+                
             else:
-                user_slug = unique_slugify(full_name)
-                user = User.objects.create_user(
-                    username=user_slug,
-                    branch=branch.title,
-                    position=position,
-                    fio=full_name,
-                    user_slug=user_slug
-                )
+                context['branches'] = Branch.objects.all()
+                context['positions'] = Position.objects.none()
 
-                lang_code = request.COOKIES.get('django_language')
-                if lang_code:
-                    user.lang_code = lang_code
-                user.set_password('secure123')
-                user.save()
+                context['sections'] = Section.objects.all()
+                context['categories'] = Category.objects.none()
 
-                user = authenticate(username=user_slug, password='secure123')
-                login(request, user)
-            
-                return TemplateResponse(request, 'main/cards.html', context)
+                response = TemplateResponse(request, 'main/employee.html', context)
+        
+                if request.user.is_authenticated:
+                    lang_code = request.user.lang_code
+                    translation.activate(lang_code)
+                    request.session[settings.LANGUAGE_COOKIE_NAME] = lang_code
+                    response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
+                
+                return response
     
 
 class LanguageView(TemplateView):
@@ -117,11 +142,41 @@ class LanguageView(TemplateView):
             translation.activate(lang_code)
             request.session[settings.LANGUAGE_COOKIE_NAME] = lang_code
 
+            if request.user.is_authenticated:
+                request.user.lang_code = lang_code
+                request.user.save()
+
             context['branches'] = Branch.objects.all()
             response = TemplateResponse(request, 'main/employee.html', context)
             response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
             return response
         
+
+class TestEntryView(TemplateView):
+    template_name = 'main/test_entry.html'
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs) 
+        
+        section_id = request.GET.get("section_id")
+        if section_id and request.headers.get("HX-Request"):
+            categories = Category.objects.filter(section_id=section_id)
+            context['sections'] = Section.objects.all()
+            context['categories'] = categories
+            return TemplateResponse(request, 'main/partials/category_options.html', context)
+
+        return TemplateResponse(request, self.template_name, context)
+
+
+class QuestionView(TemplateView):
+    template_name = 'main/questions.html'
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs)
+    
 
 '''class CardsView(TemplateView):
     template_name = 'main/base.html'

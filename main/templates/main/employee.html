@@ -38,13 +38,36 @@
         </div>
 
         <div class="form-group">
-            <label for="fullName">{% trans "Full name" %}</label>
-            <input type="text" id="fullName" name="fullName" placeholder="{% trans 'Enter full name' %}" required>
+            <label for="number">{% trans "Tabel number" %}</label>
+            <input type="text" id="number" name="number" placeholder="{% trans 'Enter tabel number' %}" required>
         </div>
 
-        <button type="submit" class="btn" style="margin-bottom: 15px;">{% trans "Proceed to ticket selection" %}</button>
-        <a href="{% url 'main:language' %}" hx-get="{% url 'main:language' %}" hx-target="#main-content" hx-swap="innerHTML" class="btn">{% trans "Change language" %}</a>
+        <div class="form-group">
+            <label for="fullName">{% trans "Full name" %}</label>
+            <input type="text" id="fullName" name="fullName" placeholder="{% trans 'Enter full name' %}" readonly required>
+        </div>
+
+        <button type="submit" class="btn" style="margin-bottom: 15px;">{% trans "Next" %}</button>
+        <a href="{% url 'main:language' %}" hx-get="{% url 'main:language' %}" hx-target="#main-content"
+            hx-swap="innerHTML" class="btn">{% trans "Change language" %}</a>
     </form>
 </div>
+
+<script>
+    document.getElementById('number').addEventListener('input', function () {
+        const number = this.value;
+        if (number) {
+            if (number.length == 4) {
+                url = new URL("{% url 'main:index' %}", window.location.origin);
+                url.searchParams.append("number", number);
+                fetch(url.toString())
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('fullName').value = data.full_name || '';
+                    });
+            }
+        }
+    });
+</script>
 
 {% endblock %}

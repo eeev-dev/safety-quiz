@@ -43,14 +43,11 @@ class BranchAdmin(admin.ModelAdmin):
 
 
 class EmployeeAdmin(admin.ModelAdmin):
-    fields = ['branch', 'position', 'fio', 'score', 'total', 'last_date_passed']
+    fields = ['branch', 'position', 'fio', 'score', 'total', 'last_date_passed', 'number', 'tries', 'lang_code', 'username']
     list_display = ['branch', 'position', 'fio', 'score', 'total', 'last_date_passed']
     list_filter = ['branch', 'last_date_passed']
     search_fields = ['fio']
     inlines = [AnswerInline]
-
-    def has_add_permission(self, request, obj=None):
-        return False
     
 
 class SectionAdmin(admin.ModelAdmin):

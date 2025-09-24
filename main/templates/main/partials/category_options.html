@@ -1,0 +1,10 @@
+{% load i18n %}
+
+<div class="form-group" id="category">
+    <label for="category">{% trans "Category" %}</label>
+    <select name="category" required>
+        {% for category in categories %}
+            <option value="{{ category.title }}">{{ category.title }}</option>
+        {% endfor %}
+    </select>
+</div>

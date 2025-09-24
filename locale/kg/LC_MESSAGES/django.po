@@ -3,6 +3,33 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language: kg\n"
 
+msgid "Test"
+msgstr "Тест"
+
+msgid "Section"
+msgstr "Бөлүм"
+
+msgid "Select section"
+msgstr "Бөлүмдү тандаңыз"
+
+msgid "First select section"
+msgstr "Алгач бөлүмдү тандаңыз"
+
+msgid "Category"
+msgstr "Кызматкерлердин категориясы"
+
+msgid "Proceed to test"
+msgstr "Тестке өтүү"
+
+msgid "Tabel number"
+msgstr "Табель номери"
+
+msgid "Enter tabel number"
+msgstr "Табель номерин киргизиңиз"
+
+msgid "Next"
+msgstr "Кийинки"
+
 msgid "Safety measures"
 msgstr "Коопсуздук чаралары"
 
