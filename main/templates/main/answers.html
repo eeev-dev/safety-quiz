@@ -6,14 +6,13 @@
 
 {% load i18n %}
 
-<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/answer.css' %}">
+<link id="style-link" hx-swap-oob="true" rel="stylesheet" href="{% static 'main/css/answers.css' %}">
 
 <div class="card profile-card">
   <div class="profile-info">
     <p><strong>{% trans "Branch" %}:</strong> {{ employee.branch }}</p>
     <p><strong>{% trans "Position" %}:</strong> {{ employee.position }}</p>
     <p><strong>{% trans "Full name" %}:</strong> {{ employee.fio }}</p>
-    <p><strong>{% trans "Ticket" %}:</strong> №{{ employee.card_number }}</p>
     <p><strong>{% trans "Date" %}:</strong> {{ employee.date_passed|date:"d.m.Y H:i" }}</p>
   </div>
 </div>

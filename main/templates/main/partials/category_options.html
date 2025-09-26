@@ -4,7 +4,7 @@
     <label for="category">{% trans "Category" %}</label>
     <select name="category" required>
         {% for category in categories %}
-            <option value="{{ category.title }}">{{ category.title }}</option>
+            <option value="{{ category.id }}">{{ category.title }}</option>
         {% endfor %}
     </select>
 </div>

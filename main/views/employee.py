@@ -75,13 +75,14 @@ class IndexView(TemplateView):
                 else:
                     user_slug = unique_slugify(full_name)
 
-                    employee.username = user_slug
                     employee.branch = branch.title
                     employee.position = position
 
                     lang_code = request.COOKIES.get('django_language')
                     if lang_code:
                         employee.lang_code = lang_code
+
+                    employee.username = user_slug
                     employee.set_password('secure123')
                     employee.save()
 
@@ -89,12 +90,14 @@ class IndexView(TemplateView):
                     login(request, user)
 
                 if user.tries > 0:
+                    user.score = 0
+                    user.save()
                     context['sections'] = Section.objects.all()
                     context['categories'] = Category.objects.none()
                     return TemplateResponse(request, 'main/test_entry.html', context)
                 else:
                     context['employee'] = user
-                    context['answers'] = user.answers.all()
+                    context['answers'] = user.answers.filter(date_passed=user.last_date_passed).order_by('id')
                     context['is_passed'] = passed_test(user.score, user.total)
                     return TemplateResponse(request, 'main/answers.html', context)
                 

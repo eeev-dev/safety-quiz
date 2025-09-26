@@ -14,7 +14,7 @@
         <progress id="countdown" value="600000" max="600000"></progress>
     </div>
 
-    <form method="post" action="{% url 'questions' %}" hx-post="{% url 'main:questions' %}" hx-target="#main-content" hx-swap="innerHTML">
+    <form id="question-form" method="post" action="{% url 'main:questions' %}" hx-post="{% url 'main:questions' %}" hx-target="#main-content" hx-swap="innerHTML">
         {% csrf_token %}
         {% for question in questions %}
         <div class="card">
@@ -26,10 +26,10 @@
             </div>
 
             <div class="answers-section">
-                {% for option in question.options.all %}
+                {% for option in question.options %}
                 <div class="form-group">
                     <label>
-                        <input type="radio" name="answer_{{ question.id }}" value="{{ option.id }}" />
+                        <input type="radio" name="answer_{{ question.id }}" value="{{ option.id }}" required/>
                         {{ option.option }}
                     </label>
                 </div>
@@ -61,19 +61,16 @@
         } else {
             clearInterval(timer);
 
-            const selectedAnswer = document.querySelector('input[name="answer"]:checked');
-            const url = new URL("{% url 'main:card' %}", window.location.origin);
-            if (selectedAnswer) {
-                url.searchParams.append("answer", selectedAnswer.value);
-            }
+            const form = document.getElementById('question-form');
+            const formData = new FormData(form);
 
-            fetch(url.toString(), {
-                method: "GET",
+            fetch("{% url 'main:questions' %}", {
+                method: "POST",
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
-                    "Content-Type": "application/x-www-form-urlencoded",
                     "X-CSRFToken": getCookie("csrftoken")
-                }
+                },
+                body: new URLSearchParams(formData)
             })
                 .then(response => {
                     if (!response.ok) throw new Error("Network response was not ok");

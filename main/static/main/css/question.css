@@ -23,6 +23,8 @@ body {
     background: #ffffff;
     padding: 40px 30px;
     width: 100%;
+    margin-top: 12px;
+    margin-bottom: 12px;
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
@@ -30,14 +32,23 @@ body {
 }
 
 .timer {
+    position: sticky;
+    top: 12px;
+    z-index: 1000;
     width: 100%;
-    background: #ffffff;
+    background: #3399ff;
     padding: 15px;
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
     word-wrap: break-word;
+    margin-top: 15px;
     margin-bottom: 15px;
+}
+
+.timer div {
+    color: white;
+    font-size: large;
 }
 
 progress {
@@ -47,6 +58,22 @@ progress {
     appearance: auto;
     block-size: 1em;
     vertical-align: -0.2em;
+    border: none;
+    background-color: transparent;
+}
+
+progress::-webkit-progress-bar {
+    background-color: rgba(255, 255, 255, 0.2); /* фон шкалы */
+    border-radius: 10px;
+}
+
+progress::-webkit-progress-value {
+    background-color: #ffffff; /* прогресс-бар — белый */
+    border-radius: 10px;
+}
+
+progress::-moz-progress-bar {
+    background-color: #ffffff;
 }
 
 h2 {

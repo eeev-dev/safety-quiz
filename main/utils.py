@@ -15,12 +15,15 @@ def passed_test(correct_answers: int, total_questions: int) -> bool:
     return percentage >= 70
 
 
-def serialize_question(question, current_lang):
-    return {
-        "id": question.id,
-        "question": question.question_kg if current_lang == 'kg' else question.question_ru,
-        "image": question.image
-    }
+def serialize_questions(questions, current_lang):
+    return [
+        {
+            "id": question.id,
+            "question": question.question_kg if current_lang == 'kg' else question.question_ru,
+            "options": serialize_options(question.options.all(), current_lang)
+        }
+        for question in questions
+    ]
     
 
 def serialize_options(options, current_lang):
