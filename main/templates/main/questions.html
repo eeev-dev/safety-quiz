@@ -19,7 +19,7 @@
         {% for question in questions %}
         <div class="card">
             <div class="question-section">
-                <p>{{ question.question }}</p>
+                <p>{{question.number}}. {{ question.question }}</p>
                 {% if question.image %}
                 <img class="image" src="{{ question.image.url }}" alt="{% trans 'Picture' %}">
                 {% endif %}

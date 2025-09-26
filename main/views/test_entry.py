@@ -39,12 +39,17 @@ class TestEntryView(TemplateView):
             random_ids = random.sample(list(ids), 10)
             questions = Question.objects.filter(id__in=random_ids).order_by('id')
 
+            i = 1
             for question in questions:
                 correct_option = question.options.filter(is_correct=True).first()
+                question.number = i
+                question.save()
+                i += 1
 
                 if request.user.lang_code == 'ru':
                     Answer.objects.create(
                         employee = request.user,
+                        number = question.number,
                         question = question.question_ru,
                         answer = "Ответ не был выбран",
                         correct_answer = correct_option.option_ru if correct_option else "Правильный ответ был не указан",
@@ -53,6 +58,7 @@ class TestEntryView(TemplateView):
                 else:
                     Answer.objects.create(
                         employee = request.user,
+                        number = question.number,
                         question = question.question_kg,
                         answer = "Жооп тандалган жок",
                         correct_answer = correct_option.option_kg if correct_option else "Туура жооп көрсөтүлгөн эмес",

@@ -23,6 +23,7 @@ class EmployeeUser(AbstractUser):
 
 class Answer(models.Model):
     employee = models.ForeignKey(EmployeeUser, on_delete=models.CASCADE, related_name='answers')
+    number = models.IntegerField("Номер вопроса", null=True)
     question = models.TextField("Вопрос", default="")
     answer = models.TextField("Ответ сотрудника", default="", blank=True, null=True)
     correct_answer = models.TextField("Правильный ответ", default="")
@@ -61,6 +62,7 @@ class Category(models.Model):
 
 class Question(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, related_name='questions') 
+    number = models.IntegerField("Номер вопроса", null=True)
     question_ru = models.TextField("Вопрос на русском", default="")
     question_kg = models.TextField("Вопрос на кыргызском", default="", blank=True, null=True)
     image = models.ImageField(upload_to='questions/', blank=True, null=True)
