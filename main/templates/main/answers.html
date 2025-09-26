@@ -13,7 +13,7 @@
     <p><strong>{% trans "Branch" %}:</strong> {{ employee.branch }}</p>
     <p><strong>{% trans "Position" %}:</strong> {{ employee.position }}</p>
     <p><strong>{% trans "Full name" %}:</strong> {{ employee.fio }}</p>
-    <p><strong>{% trans "Date" %}:</strong> {{ employee.date_passed|date:"d.m.Y H:i" }}</p>
+    <p><strong>{% trans "Date" %}:</strong> {{ employee.last_date_passed|date:"d.m.Y H:i" }}</p>
   </div>
 </div>
 <div class="card results-card">
@@ -30,13 +30,13 @@
   {% for answer in answers %}
   {% if answer.answer == answer.correct_answer %}
   <div class="answer-card correct">
-    <h3>{{ answer.question }}</h3>
+    <h3>{{answer.number}}. {{ answer.question }}</h3>
     <p><span class="label">{% trans "Correct answer" %}:</span> {{ answer.correct_answer }}</p>
   </div>
   {% else %}
 
   <div class="answer-card incorrect">
-    <h3>{{ answer.question }}</h3>
+    <h3>{{answer.number}}. {{ answer.question }}</h3>
     <p><span class="label">{% trans "Correct answer" %}:</span> {{ answer.correct_answer }}</p>
     <p><span class="label">{% trans "Your answer" %}:</span> {{ answer.answer }}</p>
   </div>

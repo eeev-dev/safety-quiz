@@ -1,9 +1,0 @@
-{% for card in cards %}
-<form hx-post="{% url 'main:cards' %}?id={{ card.id }}"  
-    hx-swap="innerHTML" 
-    hx-target="#main-content"
->
-{% csrf_token %}
-<button type="submit" class="card">{{ card.number }}</button>
-</form>
-{% endfor %}

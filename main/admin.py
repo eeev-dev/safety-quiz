@@ -30,6 +30,10 @@ class AnswerInline(admin.TabularInline):
     
     def is_correct(self, obj):
         return obj.answer == obj.correct_answer
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.order_by('-date_passed').order_by('number')
 
 
 class CategoryInline(admin.TabularInline):
@@ -43,7 +47,7 @@ class BranchAdmin(admin.ModelAdmin):
 
 
 class EmployeeAdmin(admin.ModelAdmin):
-    fields = ['branch', 'position', 'fio', 'score', 'total', 'last_date_passed', 'number', 'tries', 'lang_code', 'username']
+    fields = ['branch', 'position', 'fio', 'score', 'total', 'last_date_passed', 'number', 'tries']
     list_display = ['branch', 'position', 'fio', 'score', 'total', 'last_date_passed']
     list_filter = ['branch', 'last_date_passed']
     search_fields = ['fio']

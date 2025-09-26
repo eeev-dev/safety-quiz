@@ -8,7 +8,7 @@ class EmployeeUser(AbstractUser):
     fio = models.CharField("ФИО", max_length=100, default="")
     number = models.CharField("Табельный номер", max_length=10, unique=True)
     tries = models.IntegerField("Попыток сдачи", default=2)
-    score = models.IntegerField("Результат", default=0)
+    score = models.IntegerField("Последний результат", default=0)
     total = models.IntegerField("Всего вопросов", default=10)
     last_date_passed = models.DateTimeField("Последняя попытка прохождения теста", blank=True, null=True)
     lang_code = models.CharField("Язык", max_length=3, default='ru')

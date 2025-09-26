@@ -37,7 +37,6 @@ class QuestionView(TemplateView):
                     continue
 
         answers = request.user.answers.filter(date_passed=request.user.last_date_passed)
-        print(answers.count())
 
         for question_id, option_id in selected_options.items():
             option = get_object_or_404(Option, id=option_id)
