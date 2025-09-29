@@ -45,7 +45,7 @@ class EmployeeUser(AbstractUser):
 class Answer(models.Model):
     employee = models.ForeignKey(EmployeeUser, on_delete=models.CASCADE, related_name='answers')
     number = models.IntegerField("Номер вопроса", null=True)
-    question = models.TextField("Вопрос", default="")
+    question = models.TextField("Вопрос", null=True, blank=True)
     answer = models.TextField("Ответ сотрудника", default="", blank=True, null=True)
     correct_answer = models.TextField("Правильный ответ", default="")
     date_passed = models.DateTimeField("Дата прохождения", blank=True, null=True)
