@@ -2,6 +2,7 @@ from django.views.generic import TemplateView
 from docx import Document
 from django.http import FileResponse
 import io
+from ..utils import passed_test
 
 class AnswersView(TemplateView):
     template_name = 'main/answers.html'
@@ -22,6 +23,8 @@ class AnswersView(TemplateView):
             doc.add_paragraph(f'Должность: {user.position}')
             doc.add_paragraph(f'Правильных ответов: {user.score} из {user.total}')
             doc.add_paragraph(f'Дата прохождения: {user.last_date_passed.strftime('%d.%m.%Y %H:%M')}')
+            doc.add_paragraph(f'Табельный номер: {user.number}')
+            doc.add_paragraph(f'Результат: {"Пройден" if passed_test(user.score, user.total) else "Не пройден"}')
             doc.add_paragraph('С результатами ознакомлен(-а): ______________')
 
             doc.add_heading('Ответы на вопросы', level=1)
@@ -46,6 +49,8 @@ class AnswersView(TemplateView):
             doc.add_paragraph(f'Кызматы: {user.position}')
             doc.add_paragraph(f'Туура жооптордун саны: {user.score} / {user.total}')
             doc.add_paragraph(f'Өткөн күнү: {user.last_date_passed.strftime('%d.%m.%Y %H:%M')}')
+            doc.add_paragraph(f'Табелдик номер: {user.number}')
+            doc.add_paragraph(f'Жыйынтык: {"Өттү" if passed_test(user.score, user.total) else "Өтпөй калды"}')
             doc.add_paragraph('Жыйынтыгы менен тааныштым: ______________')
 
             doc.add_heading('Суроолорго берилген жооптор', level=1)
@@ -53,7 +58,7 @@ class AnswersView(TemplateView):
             for answer in answers:
                 doc.add_paragraph(answer.question, style='List Number')
                 doc.add_paragraph(f'Туура жооп: {answer.correct_answer}')
-                doc.add_paragraph(f'Кызматкердин жообу: {answer.answer}')
+                doc.add_paragraph(f'Сиздин жообу: {answer.answer}')
 
             buffer = io.BytesIO()
             doc.save(buffer)

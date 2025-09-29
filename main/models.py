@@ -62,8 +62,7 @@ class Category(models.Model):
 
 class Question(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, related_name='questions') 
-    number = models.IntegerField("Номер вопроса", null=True)
-    question_ru = models.TextField("Вопрос на русском", default="")
+    question_ru = models.TextField("Вопрос на русском", blank=False, null=False)
     question_kg = models.TextField("Вопрос на кыргызском", default="", blank=True, null=True)
     image = models.ImageField(upload_to='questions/', blank=True, null=True)
 
@@ -77,7 +76,7 @@ class Question(models.Model):
 
 class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
-    option_ru = models.TextField("Вариант ответа на русском", default="")
+    option_ru = models.TextField("Вариант ответа на русском", null=False, blank=False)
     option_kg = models.TextField("Вариант ответа на кыргызском", default="", blank=True, null=True)
     is_correct = models.BooleanField(default=False)
 

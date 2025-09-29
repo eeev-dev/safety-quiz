@@ -19,13 +19,13 @@ def serialize_questions(questions, current_lang):
     return [
         {
             "id": question.id,
-            "number": question.number,
+            "number": i + 1,
             "question": question.question_kg if current_lang == 'kg' else question.question_ru,
             "options": serialize_options(question.options.all(), current_lang)
         }
-        for question in questions
+        for i, question in enumerate(questions)
     ]
-    
+
 
 def serialize_options(options, current_lang):
     return [
