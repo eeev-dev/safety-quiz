@@ -3,6 +3,7 @@ from docx import Document
 from django.http import FileResponse
 import io
 from ..utils import passed_test
+from django.utils.timezone import localtime
 
 class AnswersView(TemplateView):
     template_name = 'main/answers.html'
@@ -14,6 +15,7 @@ class AnswersView(TemplateView):
     def get(self, request, *args, **kwargs):
         user = request.user
         answers = user.answers.filter(date_passed=request.user.last_date_passed).order_by('id')
+        local_dt = localtime(user.last_date_passed)
 
         if user.lang_code == 'ru':
             doc = Document()
@@ -22,7 +24,7 @@ class AnswersView(TemplateView):
             doc.add_paragraph(f'Филиал: {user.branch}')
             doc.add_paragraph(f'Должность: {user.position}')
             doc.add_paragraph(f'Правильных ответов: {user.score} из {user.total}')
-            doc.add_paragraph(f'Дата прохождения: {user.last_date_passed.strftime('%d.%m.%Y %H:%M')}')
+            doc.add_paragraph(f'Дата прохождения: {local_dt.strftime('%d.%m.%Y %H:%M')}')
             doc.add_paragraph(f'Табельный номер: {user.number}')
             doc.add_paragraph(f'Результат: {"Пройден" if passed_test(user.score, user.total) else "Не пройден"}')
             doc.add_paragraph('С результатами ознакомлен(-а): ______________')
@@ -48,7 +50,7 @@ class AnswersView(TemplateView):
             doc.add_paragraph(f'Филиал: {user.branch}')
             doc.add_paragraph(f'Кызматы: {user.position}')
             doc.add_paragraph(f'Туура жооптордун саны: {user.score} / {user.total}')
-            doc.add_paragraph(f'Өткөн күнү: {user.last_date_passed.strftime('%d.%m.%Y %H:%M')}')
+            doc.add_paragraph(f'Өткөн күнү: {local_dt.strftime('%d.%m.%Y %H:%M')}')
             doc.add_paragraph(f'Табелдик номер: {user.number}')
             doc.add_paragraph(f'Жыйынтык: {"Өттү" if passed_test(user.score, user.total) else "Өтпөй калды"}')
             doc.add_paragraph('Жыйынтыгы менен тааныштым: ______________')

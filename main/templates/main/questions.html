@@ -11,7 +11,7 @@
 <div class="card-container">
     <div class="timer">
         <div id="countdown-text" align="center">10:00</div>
-        <progress id="countdown" value="600000" max="600000"></progress>
+        <progress id="countdown" value="{{ millis }}" max="{{ millis }}"></progress>
     </div>
 
     <form id="question-form" method="post" action="{% url 'main:questions' %}" hx-post="{% url 'main:questions' %}" hx-target="#main-content" hx-swap="innerHTML">
@@ -43,9 +43,9 @@
 </div>
 
 <script>
-    let time = 600000; // 10 минут
-    let time_progress = 600000; // 10 минут
-    let minutes = 10;
+    let time = {{ millis }};
+    let time_progress = {{ millis }};
+    let minutes = {{ millis }} / 60 / 1000;
     let seconds = 0;
     const timer = setInterval(() => {
         const countdownElement = document.getElementById('countdown');

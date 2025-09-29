@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.http import HttpRequest
 from django.template.response import TemplateResponse
-from ..models import EmployeeUser, Branch, Position, Category, Section
+from ..models import EmployeeUser, Branch, Position, Category, Section, Settings
 from django.contrib.auth import login, authenticate
 from ..utils import unique_slugify, passed_test
 from django.utils import translation
@@ -91,6 +91,8 @@ class IndexView(TemplateView):
 
                 if user.tries > 0:
                     user.score = 0
+                    settings = Settings.load()
+                    user.total = settings.questions
                     user.save()
                     context['sections'] = Section.objects.all()
                     context['categories'] = Category.objects.none()

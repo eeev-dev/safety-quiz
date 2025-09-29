@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 from django.template.response import TemplateResponse
-from ..models import Category, Section, Question, Answer
+from ..models import Category, Section, Question, Answer, Settings
 from django.shortcuts import get_object_or_404
 import random
 from ..utils import serialize_questions
@@ -35,8 +35,9 @@ class TestEntryView(TemplateView):
             request.user.tries -= 1
             request.user.save()
 
+            settings = Settings.load()
             ids = category.questions.values_list('id', flat=True)
-            random_ids = random.sample(list(ids), 10)
+            random_ids = random.sample(list(ids), settings.questions)
             questions = Question.objects.filter(id__in=random_ids).order_by('id')
 
             for i, question in enumerate(questions):
@@ -61,5 +62,6 @@ class TestEntryView(TemplateView):
                         date_passed = date
                     )
 
+            context['millis'] = settings.timer * 60 * 1000
             context['questions'] = serialize_questions(questions, request.user.lang_code)
             return TemplateResponse(request, 'main/questions.html', context)
