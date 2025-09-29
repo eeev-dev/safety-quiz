@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import EmployeeUser, Answer, Question, Option, Branch, Position, Section, Category
-import nested_admin
+from .models import EmployeeUser, Answer, Question, Option, Branch, Position, Section, Category, Settings
 from django.core.exceptions import ValidationError
 
 
@@ -66,6 +65,18 @@ class QuestionAdmin(admin.ModelAdmin):
     search_fields = ['question_ru', 'question_kg']
 
 
+class SettingsAdmin(admin.ModelAdmin):
+    list_display = ['timer', 'questions']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return not Settings.objects.exists()
+    
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+admin.site.register(Settings, SettingsAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Branch, BranchAdmin)

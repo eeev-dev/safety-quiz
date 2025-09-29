@@ -2,11 +2,32 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
+class Settings(models.Model):
+    timer = models.IntegerField("Минуты таймера", default=10)
+    questions = models.IntegerField("Количество вопросов", default=10)
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+    class Meta:
+        verbose_name = "настройки"
+        verbose_name_plural = "Настройки"
+
+
 class EmployeeUser(AbstractUser):
     branch = models.CharField("Филиал", max_length=100, default="")
     position = models.CharField("Должность", max_length=100, default="")
-    fio = models.CharField("ФИО", max_length=100, default="")
-    number = models.CharField("Табельный номер", max_length=10, unique=True)
+    fio = models.CharField("ФИО", max_length=100, null=False, blank=False)
+    number = models.CharField("Табельный номер", max_length=10, unique=True, null=False, blank=False)
     tries = models.IntegerField("Попыток сдачи", default=2)
     score = models.IntegerField("Последний результат", default=0)
     total = models.IntegerField("Всего вопросов", default=10)
@@ -63,7 +84,7 @@ class Category(models.Model):
 class Question(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, related_name='questions') 
     question_ru = models.TextField("Вопрос на русском", blank=False, null=False)
-    question_kg = models.TextField("Вопрос на кыргызском", default="", blank=True, null=True)
+    question_kg = models.TextField("Вопрос на кыргызском", blank=False, null=False)
     image = models.ImageField(upload_to='questions/', blank=True, null=True)
 
     def __str__(self):
@@ -77,7 +98,7 @@ class Question(models.Model):
 class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
     option_ru = models.TextField("Вариант ответа на русском", null=False, blank=False)
-    option_kg = models.TextField("Вариант ответа на кыргызском", default="", blank=True, null=True)
+    option_kg = models.TextField("Вариант ответа на кыргызском", blank=False, null=False)
     is_correct = models.BooleanField(default=False)
 
     def __str__(self):
