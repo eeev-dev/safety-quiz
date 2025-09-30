@@ -1,7 +1,7 @@
 {% load i18n %}
 
-<div class="form-group" id="category">
-    <label for="category">{% trans "Category" %}</label>
+<div class="form-group" id="category" style="margin-bottom: 15px;">
+    <label for="category" style="margin-right: 15px;">{% trans "Category" %}</label>
     <select name="category" required>
         {% for category in categories %}
             <option value="{{ category.id }}">{{ category.title }}</option>

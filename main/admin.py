@@ -1,6 +1,12 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from .models import EmployeeUser, Answer, Question, Option, Branch, Position, Section, Category, Settings
-from django.core.exceptions import ValidationError
+from django.urls import path
+from django.shortcuts import render, redirect
+from django import forms
+from django.shortcuts import get_object_or_404
+from .utils import parse_question_block
+from docx import Document
+from django.contrib.admin import SimpleListFilter
 
 
 class PositionInline(admin.TabularInline):
@@ -58,12 +64,105 @@ class SectionAdmin(admin.ModelAdmin):
     inlines = [CategoryInline]
 
 
-class QuestionAdmin(admin.ModelAdmin):
-    list_display = ['category', 'question_ru', 'question_kg', 'image']
-    inlines = [OptionInline]
-    list_filter = ['category']
-    search_fields = ['question_ru', 'question_kg']
+class UploadForm(forms.Form):
+    file = forms.FileField(label="Выберите файл .docx для загрузки")
 
+
+class HasCorrectFilter(SimpleListFilter):
+    title = 'Есть правильный вариант'
+    parameter_name = 'has_correct'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Есть'),
+            ('no', 'Нет'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            return queryset.filter(options__is_correct=True).distinct()
+        elif self.value() == 'no':
+            return queryset.exclude(options__is_correct=True).distinct()
+        return queryset
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = ['category', 'question_ru', 'question_kg']
+    inlines = [OptionInline]
+    list_filter = ['category', HasCorrectFilter]
+    search_fields = ['question_ru', 'question_kg']
+    change_list_template = "admin/main/question/change_list.html"
+
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path("import-questions/", self.admin_site.admin_view(self.parse_from_doc)),
+            path("upload-questions/", self.admin_site.admin_view(self.upload_questions), name='upload_questions')
+        ]
+        return custom_urls + urls
+    
+
+    def upload_questions(self, request):
+        if request.method == "POST":
+            category_id = request.POST.get("category_id")
+            category = get_object_or_404(Category, id=category_id)
+
+            question_keys = [key for key in request.POST if key.startswith("question_") and key.endswith("_ru")]
+            question_indices = sorted(set(key.split("_")[1] for key in question_keys), key=int)
+
+            for q_idx in question_indices:
+                question_ru = request.POST.get(f"question_{q_idx}_ru")
+                question_kg = request.POST.get(f"question_{q_idx}_kg")
+
+                option_keys = [key for key in request.POST if key.startswith(f"option_{q_idx}_ru_")]
+                option_indices = sorted(set(key.split("_")[-1] for key in option_keys), key=int)
+
+                question = Question.objects.create(
+                    category = category,
+                    question_ru = question_ru,
+                    question_kg = question_kg
+                )
+
+                for opt_idx in option_indices:
+                    option_ru = request.POST.get(f"option_{q_idx}_ru_{opt_idx}")
+                    option_kg = request.POST.get(f"option_{q_idx}_kg_{opt_idx}")
+                    correct = request.POST.get(f"correct_{q_idx}_{opt_idx}")
+
+                    question.options.create(
+                        option_ru=option_ru,
+                        option_kg=option_kg,
+                        is_correct=True if correct == "on" else False
+                    )
+
+            return redirect('/admin/main/question')
+
+
+    def parse_from_doc(self, request):
+        if request.method == "POST":
+            form = UploadForm(request.POST, request.FILES)
+            if form.is_valid():
+                file = form.cleaned_data['file']
+                category_id = request.POST.get('category')
+
+                doc = Document(file)
+                paragraphs = doc.paragraphs
+                results = parse_question_block(paragraphs)
+                
+                return render(request, "admin/edit_parse_results.html", {
+                    "results": list(enumerate(results, 1)),
+                    "category_id": category_id,
+                })
+        else:
+            form = UploadForm()
+
+        return render(request, "admin/upload_from_doc.html", {
+            "form": form,
+            "title": "Загрузить вопросы из документа",
+            "sections": Section.objects.all(),
+            "categories": Category.objects.none()
+        })
+    
 
 class SettingsAdmin(admin.ModelAdmin):
     list_display = ['timer', 'questions']
