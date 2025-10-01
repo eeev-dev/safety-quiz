@@ -1,0 +1,15 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block content %}
+  <p> Баллы за прохождение от {{ selected_date }}: <strong> {{ employee_score }}/{{ employee_total }} </strong> </p>
+  <form method="get" id="date-filter-form" style="margin-bottom: 10px;">
+    <select name="answer_date" id="answer-date" onchange="document.getElementById('date-filter-form').submit();">
+        <option value="" disabled selected>Выберите дату прохождения</option>
+        {% for date in available_dates %}
+            <option value="{{ date }}" > {{ date }} </option>
+        {% endfor %}
+    </select>
+  </form>
+  {{ block.super }}
+{% endblock %}

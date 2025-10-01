@@ -1,12 +1,15 @@
-from django.contrib import admin, messages
+from django.contrib import admin
 from .models import EmployeeUser, Answer, Question, Option, Branch, Position, Section, Category, Settings
 from django.urls import path
 from django.shortcuts import render, redirect
 from django import forms
 from django.shortcuts import get_object_or_404
-from .utils import parse_question_block
+from .utils import parse_question_block, parse_russian_date
 from docx import Document
 from django.contrib.admin import SimpleListFilter
+from rangefilter.filters import DateRangeFilter
+from datetime import timedelta
+from django.db.models import F
 
 
 class PositionInline(admin.TabularInline):
@@ -17,6 +20,16 @@ class PositionInline(admin.TabularInline):
 class OptionInline(admin.TabularInline):
     model = Option
     extra = 0
+
+
+class CategoryInline(admin.TabularInline):
+    model = Category
+    extra = 0
+
+
+class BranchAdmin(admin.ModelAdmin):
+    list_display = ['title']
+    inlines = [PositionInline]
 
 
 class AnswerInline(admin.TabularInline):
@@ -38,25 +51,55 @@ class AnswerInline(admin.TabularInline):
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.order_by('-date_passed').order_by('number')
+        all_dates = qs.values_list('date_passed', flat=True).distinct().order_by('-date_passed')
 
+        selected_date = request.GET.get('answer_date')
 
-class CategoryInline(admin.TabularInline):
-    model = Category
-    extra = 0
+        if selected_date:
+            try:
+                selected_date_obj = parse_russian_date(selected_date)
+            except ValueError:
+                selected_date_obj = None
+        else:
+            selected_date_obj = all_dates.first()
 
+        if selected_date_obj:
+            start = selected_date_obj.replace(second=0, microsecond=0)
+            end = start + timedelta(minutes=1)
+            qs = qs.filter(date_passed__gte=start, date_passed__lt=end)
 
-class BranchAdmin(admin.ModelAdmin):
-    list_display = ['title']
-    inlines = [PositionInline]
+        return qs.order_by('number')
 
 
 class EmployeeAdmin(admin.ModelAdmin):
-    fields = ['branch', 'position', 'fio', 'score', 'total', 'last_date_passed', 'number', 'tries']
+    fields = ['branch', 'position', 'fio', 'score', 'total', 'number', 'tries']
     list_display = ['branch', 'position', 'fio', 'score', 'total', 'last_date_passed']
-    list_filter = ['branch', 'last_date_passed']
+    list_filter = [
+        'branch',
+        ('last_date_passed', DateRangeFilter)
+    ]
     search_fields = ['fio']
     inlines = [AnswerInline]
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+
+        answers = Answer.objects.filter(employee_id=object_id)
+        dates = answers.values_list('date_passed', flat=True).distinct().order_by('-date_passed')
+
+        selected_date = request.GET.get('answer_date') or (dates.first() if dates else None)
+        selected_date_obj = parse_russian_date(selected_date)
+        start = selected_date_obj.replace(second=0, microsecond=0)
+        end = start + timedelta(minutes=1)
+        qs = answers.filter(date_passed__gte=start, date_passed__lt=end)
+        
+        extra_context['employee_score'] = qs.filter(correct_answer=F('answer')).count()
+        extra_context['employee_total'] = qs.count()
+
+        extra_context['available_dates'] = dates
+        extra_context['selected_date'] = selected_date
+
+        return super().change_view(request, object_id, form_url, extra_context=extra_context)
     
 
 class SectionAdmin(admin.ModelAdmin):

@@ -4,6 +4,40 @@ from random import shuffle
 from docx import Document
 from docx.shared import RGBColor
 import re
+from datetime import datetime
+from django.utils import timezone
+
+
+MONTHS = {
+    'января': 1,
+    'февраля': 2,
+    'марта': 3,
+    'апреля': 4,
+    'мая': 5,
+    'июня': 6,
+    'июля': 7,
+    'августа': 8,
+    'сентября': 9,
+    'октября': 10,
+    'ноября': 11,
+    'декабря': 12,
+}
+
+
+def parse_russian_date(date_str):
+    date_str = date_str.replace(' г.', '')
+    parts = date_str.split()
+    day = int(parts[0])
+    month = MONTHS[parts[1].lower()]
+    year = int(parts[2])
+    time_part = parts[3] if len(parts) > 3 else "00:00"
+    
+    hour_str, minute_str = time_part.split(':')
+    hour = int(hour_str)
+    minute = int(minute_str)
+    
+    dt = datetime(year, month, day, hour, minute, tzinfo=timezone.get_current_timezone())
+    return dt
 
 
 def unique_slugify(full_name):
