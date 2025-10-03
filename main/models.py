@@ -40,22 +40,6 @@ class EmployeeUser(AbstractUser):
     class Meta:
         verbose_name = "сотрудника"
         verbose_name_plural = "Сотрудники"
-    
-
-class Answer(models.Model):
-    employee = models.ForeignKey(EmployeeUser, on_delete=models.CASCADE, related_name='answers')
-    number = models.IntegerField("Номер вопроса", null=True)
-    question = models.TextField("Вопрос", null=True, blank=True)
-    answer = models.TextField("Ответ сотрудника", default="", blank=True, null=True)
-    correct_answer = models.TextField("Правильный ответ", default="")
-    date_passed = models.DateTimeField("Дата прохождения", blank=True, null=True)
-
-    def __str__(self):
-        return self.answer
-    
-    class Meta:
-        verbose_name = "ответ"
-        verbose_name_plural = "Ответы"
 
 
 class Section(models.Model):
@@ -107,6 +91,21 @@ class Option(models.Model):
     class Meta:
         verbose_name = "вариант ответа"
         verbose_name_plural = "Варианты ответа"
+
+
+class Answer(models.Model):
+    employee = models.ForeignKey(EmployeeUser, on_delete=models.CASCADE, related_name='answers')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers', verbose_name="Вопрос")
+    employee_option = models.ForeignKey(Option, on_delete=models.CASCADE, related_name='answers', null=True, verbose_name="Ответ сотрудника")
+    number = models.IntegerField("Номер вопроса", null=True)
+    date_passed = models.DateTimeField("Дата прохождения", blank=True, null=True)
+
+    def __str__(self):
+        return str(self.employee_option.option_ru)
+    
+    class Meta:
+        verbose_name = "ответ"
+        verbose_name_plural = "Ответы"
 
 
 class Branch(models.Model):

@@ -82,7 +82,7 @@ def parse_question_block(paragraphs):
 
         for p in paragraphs:
             text = p.text.strip()
-            if re.match(r"^\d+\.", text):
+            if re.match(r"^\d+\)", text):
                 if current_block:
                     blocks.append(current_block)
                 current_block = [p]
@@ -106,7 +106,7 @@ def parse_question_block(paragraphs):
         for p in block:
             text = p.text.strip()
 
-            if re.match(r"^\d+\.", text):
+            if re.match(r"^\d+\)", text):
                 ru_part, kg_part = text.split("~", 1)
                 if not question["ru"]:
                     question["ru"] = ru_part[3:].strip()

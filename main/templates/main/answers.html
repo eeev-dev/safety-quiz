@@ -28,19 +28,38 @@
     </div>
   </div>
   {% for answer in answers %}
-  {% if answer.answer == answer.correct_answer %}
-  <div class="answer-card correct">
-    <h3>{{answer.number}}. {{ answer.question }}</h3>
-    <p><span class="label">{% trans "Correct answer" %}:</span> {{ answer.correct_answer }}</p>
-  </div>
-  {% else %}
-
-  <div class="answer-card incorrect">
-    <h3>{{answer.number}}. {{ answer.question }}</h3>
-    <p><span class="label">{% trans "Correct answer" %}:</span> {{ answer.correct_answer }}</p>
-    <p><span class="label">{% trans "Your answer" %}:</span> {{ answer.answer }}</p>
-  </div>
-  {% endif %}
+    {% if answer.selected_answer == answer.correct_answer %}
+      {% if answer.selected_answer != None and answer.correct_answer != None %}
+      <div class="answer-card correct">
+        <h3>{{answer.number}}. {{ answer.question }}</h3>
+        <p><span class="label">{% trans "Correct answer" %}:</span> {{ answer.correct_answer }}</p>
+      </div>
+      {% else %}
+      <div class="answer-card incorrect">
+        <h3>{{answer.number}}. {{ answer.question }}</h3>
+        <p><span class="label">{% trans "Correct answer" %}:</span>{% trans "Correct answer was not applied" %}</p>
+        <p><span class="label">{% trans "Your answer" %}:</span>{% trans "The answer was not chose" %}</p>
+      </div>
+      {% endif %}
+    {% else %}
+      <div class="answer-card incorrect">
+        <h3>{{answer.number}}. {{ answer.question }}</h3>
+        <p><span class="label">{% trans "Correct answer" %}:</span>
+          {% if answer.correct_answer %}
+            {{ answer.correct_answer }}
+          {% else %}
+            {% trans "Correct answer was not applied" %}
+          {% endif %}
+        </p>
+        <p><span class="label">{% trans "Your answer" %}:</span>
+          {% if answer.selected_answer %}
+            {{ answer.selected_answer }}
+          {% else %}
+            {% trans "The answer was not chose" %}
+          {% endif %}
+        </p>
+      </div>
+    {% endif %}
   {% endfor %}
   <form method="get" action="{% url 'main:answers' %}">
     <button class="btn" type="submit">{% trans "Download document" %}</button>

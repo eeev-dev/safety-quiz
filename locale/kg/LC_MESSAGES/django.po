@@ -3,6 +3,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language: kg\n"
 
+msgid "Correct answer was not applied"
+msgstr "Туура жооп көрсөтүлгөн эмес"
+
+msgid "The answer was not chose"
+msgstr "Жооп тандалган жок"
+
 msgid "Submit all answers"
 msgstr "Тестти бүтүрүү"
 

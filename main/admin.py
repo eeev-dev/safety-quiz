@@ -8,8 +8,7 @@ from .utils import parse_question_block, parse_russian_date
 from docx import Document
 from django.contrib.admin import SimpleListFilter
 from rangefilter.filters import DateRangeFilter
-from datetime import timedelta
-from django.db.models import F
+from datetime import timedelta, datetime
 
 
 class PositionInline(admin.TabularInline):
@@ -37,7 +36,7 @@ class AnswerInline(admin.TabularInline):
     extra = 0
     can_delete = False
     show_change_link = False
-    readonly_fields = ['question', 'correct_answer', 'answer', "is_correct"]
+    readonly_fields = ['question', 'employee_option', "is_correct"]
     max_num = 0
 
     def has_add_permission(self, request, obj=None):
@@ -47,7 +46,10 @@ class AnswerInline(admin.TabularInline):
         return False
     
     def is_correct(self, obj):
-        return obj.answer == obj.correct_answer
+        return obj.employee_option.is_correct if obj.employee_option else None
+
+    is_correct.boolean = True
+    is_correct.short_description = 'Правильный ответ'
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -87,17 +89,22 @@ class EmployeeAdmin(admin.ModelAdmin):
         answers = Answer.objects.filter(employee_id=object_id)
         dates = answers.values_list('date_passed', flat=True).distinct().order_by('-date_passed')
 
-        selected_date = request.GET.get('answer_date') or (dates.first() if dates else None)
-        selected_date_obj = parse_russian_date(selected_date)
-        start = selected_date_obj.replace(second=0, microsecond=0)
-        end = start + timedelta(minutes=1)
-        qs = answers.filter(date_passed__gte=start, date_passed__lt=end)
-        
-        extra_context['employee_score'] = qs.filter(correct_answer=F('answer')).count()
-        extra_context['employee_total'] = qs.count()
+        selected_date = dates.first() if dates else None
 
-        extra_context['available_dates'] = dates
-        extra_context['selected_date'] = selected_date
+        if selected_date:
+            qs = answers.filter(date_passed=selected_date)
+
+            if not isinstance(selected_date, datetime):
+                selected_date_obj = parse_russian_date(selected_date)
+                start = selected_date_obj.replace(second=0, microsecond=0)
+                end = start + timedelta(minutes=1)
+                qs = answers.filter(date_passed__gte=start, date_passed__lt=end)
+
+            extra_context['employee_score'] = qs.filter(employee_option__is_correct=True).count()
+            extra_context['employee_total'] = qs.count()
+
+            extra_context['available_dates'] = dates
+            extra_context['selected_date'] = selected_date
 
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
     

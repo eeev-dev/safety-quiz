@@ -10,11 +10,11 @@
 
 <div class="card-container">
     <div class="timer">
-        <div id="countdown-text" align="center">10:00</div>
+        <div id="countdown-text" align="center">{{ start_timer_text }}</div>
         <progress id="countdown" value="{{ millis }}" max="{{ millis }}"></progress>
     </div>
 
-    <form id="question-form" method="post" action="{% url 'main:questions' %}" hx-post="{% url 'main:questions' %}" hx-target="#main-content" hx-swap="innerHTML">
+    <form id="question-form" method="post" action="{% url 'main:answers' %}" hx-post="{% url 'main:answers' %}" hx-target="#main-content" hx-swap="innerHTML">
         {% csrf_token %}
         {% for question in questions %}
         <div class="card">

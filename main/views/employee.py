@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.http import HttpRequest
 from django.template.response import TemplateResponse
-from ..models import EmployeeUser, Branch, Position, Category, Section, Settings
+from ..models import EmployeeUser, Branch, Position, Category, Section, Settings, Question
 from django.contrib.auth import login, authenticate
 from ..utils import unique_slugify, passed_test
 from django.utils import translation
@@ -88,7 +88,7 @@ class IndexView(TemplateView):
 
                     user = authenticate(username=user_slug, password='secure123')
                     login(request, user)
-
+        
                 if user.tries > 0:
                     user.score = 0
                     settings = Settings.load()
@@ -98,8 +98,27 @@ class IndexView(TemplateView):
                     context['categories'] = Category.objects.none()
                     return TemplateResponse(request, 'main/test_entry.html', context)
                 else:
+                    answers = []
+                    lang = request.user.lang_code or 'ru'
+                    employee_answers = request.user.answers.filter(date_passed=request.user.last_date_passed)
+                    
+                    for answer in employee_answers:
+                        question = answer.question
+                        correct_option = question.options.filter(is_correct=True).first()
+
+                        question_text = getattr(question, f'question_{lang}', '')
+                        selected_text = getattr(answer.employee_option, f'option_{lang}', None) if answer.employee_option else None
+                        correct_text = getattr(correct_option, f'option_{lang}', None) if correct_option else None
+
+                        answers.append({
+                            'number': answer.number,
+                            'question': question_text,
+                            'selected_answer': selected_text,
+                            'correct_answer': correct_text,
+                        })
+
                     context['employee'] = user
-                    context['answers'] = user.answers.filter(date_passed=user.last_date_passed).order_by('id')
+                    context['answers'] = sorted(answers, key=lambda x: x['number'])
                     context['is_passed'] = passed_test(user.score, user.total)
                     return TemplateResponse(request, 'main/answers.html', context)
                 
@@ -110,7 +129,7 @@ class IndexView(TemplateView):
                 context['sections'] = Section.objects.all()
                 context['categories'] = Category.objects.none()
 
-                response = TemplateResponse(request, 'main/employee.html', context)
+                response = TemplateResponse(request, self.template_name, context)
         
                 if request.user.is_authenticated:
                     lang_code = request.user.lang_code
