@@ -2,20 +2,163 @@
 {% load i18n %}
 
 {% block content %}
+<style>
+    h1 {
+        color: #2c3e50;
+    }
+
+    h2 {
+        color: #34495e;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 5px;
+    }
+
+    code {
+        background-color: #eee;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: Consolas, monospace;
+    }
+
+    .example {
+        background-color: #f0f8ff;
+        padding: 15px;
+        border-left: 4px solid #3498db;
+        margin: 20px 0;
+        white-space: pre-line;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid #ccc;
+    }
+
+    th,
+    td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    .highlight {
+        background-color: #fff9c4;
+    }
+
+    footer {
+        margin-top: 40px;
+        font-size: 0.9em;
+        color: #777;
+    }
+</style>
+
+<h1>📄 Инструкция по составлению документа для автоматического парсинга вопросов</h1>
+
+<p>Чтобы функция корректно распознала все вопросы и ответы, соблюдайте следующие правила оформления:</p>
+
+<h2>1. Формат вопросов</h2>
+<ul>
+    <li>Каждый вопрос <strong>начинается с номера</strong> и <strong>скобки</strong> <code>)</code> (например:
+        <code>1)</code>).
+    </li>
+    <li>Внутри строки вопроса — две версии: <strong>русская</strong> и <strong>кыргызская</strong>, разделённые символом
+        <code>~</code>.
+    </li>
+</ul>
+
+<div class="example">1) Какой цвет у неба? ~ Асман кандай түстө?</div>
+
+<h2>2. Формат вариантов ответа</h2>
+<ul>
+    <li>Каждый вариант начинается с <strong>буквы</strong> и <strong>точки</strong> <code>.</code> (например:
+        <code>A.</code>, <code>Б.</code>).
+    </li>
+    <li>Затем две версии текста — русская и кыргызская, через <code>~</code>.</li>
+</ul>
+
+<div class="example">A. Голубой ~ Көк<br>
+    B. Зелёный ~ Жашыл<br>
+    C. Красный ~ Кызыл<br>
+    D. Жёлтый ~ Сары
+</div>
+
+<h2>3. Выделение правильного ответа</h2>
+<ul>
+    <li>Чтобы указать правильный вариант, <strong>выделите его цветом заливки (highlight)</strong> в Word.</li>
+    <li>Можно использовать любой цвет, главное — чтобы была применена заливка.</li>
+</ul>
+
+<p><strong>Как выделить в Word:</strong></p>
+<ol>
+    <li>Выделите нужный текст варианта ответа.</li>
+    <li>На вкладке <strong>Главная</strong> нажмите на значок <strong>Заливки (ведро)</strong>.</li>
+    <li>Выберите цвет (например, жёлтый).</li>
+</ol>
+
+<div class="example">D. Апельсин ~ Апельсин <span class="highlight">← выделено цветом</span></div>
+
+<h2>4. Между вопросами — без пустых строк</h2>
+<ul>
+    <li>Переходите к следующему вопросу сразу после предыдущего.</li>
+    <li><strong>Не вставляйте пустые абзацы</strong> между вопросами — функция сама определит границы.</li>
+</ul>
+
+<h2>📝 Полный пример</h2>
+<div class="example">1) Что растет на дереве? ~ Даракта эмне өсөт?<br>
+    A. Яблоко ~ Алма<br>
+    B. Помидор ~ Помидор<br>
+    C. Огурец ~ Бадыраң<br>
+    <span class="highlight">D. Апельсин ~ Апельсин</span>
+
+    2) Какая это пора года? ~ Бул кайсы мезгил?<br>
+    A. Зима ~ Кыш<br>
+    <span class="highlight">B. Лето ~ Жай</span><br>
+    C. Осень ~ Күз<br>
+    D. Весна ~ Жаз
+</div>
+
+<h2>❌ Частые ошибки</h2>
+<table>
+    <tr>
+        <th>Ошибка</th>
+        <th>Почему плохо</th>
+    </tr>
+    <tr>
+        <td>Отсутствует <code>~</code> в абзаце</td>
+        <td>Этот абзац (с вопросом или ответом) будет проигноирован</td>
+    </tr>
+    <tr>
+        <td>Нет номера перед вопросом или буквы перед вариантом ответа</td>
+        <td>Этот абзац будет проигнорирован</td>
+    </tr>
+    <tr>
+        <td>Варианты не начинаются с <code>A.</code>/<code>Б.</code></td>
+        <td>Не будут распознаны как варианты ответа</td>
+    </tr>
+    <tr>
+        <td>Правильный ответ не выделен</td>
+        <td>Не будет определён как правильный</td>
+    </tr>
+</table>
+
+<br> <h1>⚠️ <strong> Чем больше документ, тем больше времени уходит на обработку. Рекомендуется загружать не более 50 вопросов за раз </strong> </h1>
+
+<h2>📌 Формат документа</h2>
+<p>Создавайте документ в Microsoft Word и сохраняйте в формате <code>.docx</code>.</p>
+
+<h2> Загрузите документ </h2> <br>
 <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="form-group" style="margin-bottom: 15px;">
         <label for="section" style="margin-right: 15px;">{% trans "Section" %}</label>
-        <select id="section" 
-            name="section_id" 
-            hx-get="{% url 'main:test-entry' %}" 
-            hx-target="#category" 
-            hx-include="#section" 
-            hx-trigger="change" 
-            hx-swap="outerHTML"
-            required
-        >
+        <select id="section" name="section_id" hx-get="{% url 'main:test-entry' %}" hx-target="#category"
+            hx-include="#section" hx-trigger="change" hx-swap="outerHTML" required>
             <option value disabled selected>{% trans "Select section" %}</option>
             {% for section in sections %}
             <option value="{{ section.id }}">{{ section.title }}</option>

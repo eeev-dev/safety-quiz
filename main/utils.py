@@ -107,29 +107,36 @@ def parse_question_block(paragraphs):
             text = p.text.strip()
 
             if re.match(r"^\d+\)", text):
-                ru_part, kg_part = text.split("~", 1)
-                if not question["ru"]:
-                    question["ru"] = ru_part[3:].strip()
-                if not question["kg"]:
-                    question["kg"] = kg_part.strip()
+                if '~' in text:
+                    ru_part, kg_part = text.split("~", 1)
+                    if not question["ru"]:
+                        clean_text = re.sub(r"^\d+\)\s*", "", ru_part.strip()).strip()
+                        question["ru"] = clean_text[0].upper() + clean_text[1:]
+                    if not question["kg"]:
+                        clean_text = re.sub(r"^\d+\)\s*", "", kg_part.strip()).strip()
+                        question["kg"] = clean_text[0].upper() + clean_text[1:]
+
             elif re.match(r"^[А-Яа-яA-Za-z]\.", text):
-                ru_text = text.split("~")[0].split(".", 1)[-1].strip()
-                kg_text = text.split("~")[1].strip() if "~" in text else ""
+                if '~' in text:
+                    ru_part, kg_part = text.split("~", 1)
 
-                is_correct = False
-                if p.runs:
-                    for run in p.runs:
-                        if run.font.highlight_color:
-                            is_correct = True
-                            break
+                    ru_option = re.sub(r"^[A-Za-zА-Яа-я]\.\s*", "", ru_part.strip()).strip()
+                    kg_option = re.sub(r"^[A-Za-zА-Яа-я]\.\s*", "", kg_part.strip()).strip()
 
-                options.append({
-                    "idx": option_counter,
-                    "ru": ru_text,
-                    "kg": kg_text,
-                    "is_correct": is_correct
-                })
-                option_counter += 1
+                    is_correct = False
+                    if p.runs:
+                        for run in p.runs:
+                            if run.font.highlight_color:
+                                is_correct = True
+                                break
+
+                    options.append({
+                        "idx": option_counter,
+                        "ru": ru_option[0].upper() + ru_option[1:],
+                        "kg": kg_option[0].upper() + kg_option[1:],
+                        "is_correct": is_correct
+                    })
+                    option_counter += 1
 
         all_questions.append({
             "question": question,

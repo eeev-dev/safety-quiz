@@ -101,7 +101,7 @@ class Answer(models.Model):
     date_passed = models.DateTimeField("Дата прохождения", blank=True, null=True)
 
     def __str__(self):
-        return str(self.employee_option.option_ru)
+        return str(self.employee_option.option_ru) if self.employee_option else "Без ответа"
     
     class Meta:
         verbose_name = "ответ"
