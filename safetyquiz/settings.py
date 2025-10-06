@@ -14,12 +14,30 @@ from pathlib import Path
 import environ
 import os
 
-env = environ.Env()
-# reading .env file
-environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+env = environ.Env()
+
+# Возможные пути к .env файлу
+LOCAL_ENV = BASE_DIR / '.env'                 # .env в корне проекта
+EXTERNAL_ENV = BASE_DIR.parent / 'external' / '.env'  # .env во внешней директории, рядом с проектом
+
+# Выбираем, какой файл использовать
+if LOCAL_ENV.exists():
+    env_file = LOCAL_ENV
+elif EXTERNAL_ENV.exists():
+    env_file = EXTERNAL_ENV
+else:
+    env_file = None
+
+# Загружаем .env
+if env_file:
+    environ.Env.read_env(str(env_file))
+    print(f".env загружен из: {env_file}")
+else:
+    print("Внимание! .env файл не найден ни в проекте, ни во внешней директории.")
 
 
 # Quick-start development settings - unsuitable for production
@@ -29,10 +47,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'otbipb.railway.kg', 'www.otbipb.railway.kg']
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    'http://otbipb.railway.kg',
+    'http://www.otbipb.railway.kg',
+]
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
 
 # Application definition
 
@@ -143,6 +173,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+SESSION_COOKIE_AGE = 86400
+SESSION_SAVE_EVERY_REQUEST = True
 
 AUTH_USER_MODEL = 'main.EmployeeUser'
 

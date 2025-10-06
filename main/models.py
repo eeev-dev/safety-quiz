@@ -24,8 +24,8 @@ class Settings(models.Model):
 
 
 class EmployeeUser(AbstractUser):
-    branch = models.CharField("Филиал", max_length=100, default="")
-    position = models.CharField("Должность", max_length=100, default="")
+    branch = models.CharField("Филиал", max_length=100, default="", blank=True)
+    position = models.CharField("Должность", max_length=100, default="", blank=True)
     fio = models.CharField("ФИО", max_length=100, null=False, blank=False)
     number = models.CharField("Табельный номер", max_length=10, unique=True, null=False, blank=False)
     tries = models.IntegerField("Попыток сдачи", default=2)
