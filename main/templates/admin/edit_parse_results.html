@@ -162,9 +162,9 @@ document.querySelector("form").addEventListener("submit", function (e) {
 
     questionBlocks.forEach(block => {
         const checkboxes = block.querySelectorAll("input[type='checkbox']");
-        const oneChecked = Array.from(checkboxes).some(cb => cb.checked);
+        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
 
-        if (!oneChecked) {
+        if (checkedCount !== 1) {
             isValid = false;
             block.style.border = "2px solid red";
         } else {
@@ -174,7 +174,7 @@ document.querySelector("form").addEventListener("submit", function (e) {
 
     if (!isValid) {
         e.preventDefault();
-        alert("Убедитесь, что в каждом вопросе выбран хотя бы один правильный вариант.");
+        alert("В каждом вопросе должен быть отмечен ровно один правильный ответ.");
     }
 });
 </script>

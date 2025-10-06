@@ -9,6 +9,8 @@ from docx import Document
 from django.contrib.admin import SimpleListFilter
 from rangefilter.filters import DateRangeFilter
 from datetime import timedelta, datetime
+from django.db import IntegrityError
+from django.contrib import messages
 
 
 class PositionInline(admin.TabularInline):
@@ -168,23 +170,25 @@ class QuestionAdmin(admin.ModelAdmin):
                 option_keys = [key for key in request.POST if key.startswith(f"option_{q_idx}_ru_")]
                 option_indices = sorted(set(key.split("_")[-1] for key in option_keys), key=int)
 
-                question = Question.objects.create(
-                    category = category,
-                    question_ru = question_ru,
-                    question_kg = question_kg
+                question, created = Question.objects.get_or_create(
+                    category=category,
+                    question_ru=question_ru,
+                    question_kg=question_kg
                 )
 
-                for opt_idx in option_indices:
-                    option_ru = request.POST.get(f"option_{q_idx}_ru_{opt_idx}")
-                    option_kg = request.POST.get(f"option_{q_idx}_kg_{opt_idx}")
-                    correct = request.POST.get(f"correct_{q_idx}_{opt_idx}")
+                if not created:
+                    for opt_idx in option_indices:
+                        option_ru = request.POST.get(f"option_{q_idx}_ru_{opt_idx}")
+                        option_kg = request.POST.get(f"option_{q_idx}_kg_{opt_idx}")
+                        correct = request.POST.get(f"correct_{q_idx}_{opt_idx}")
 
-                    question.options.create(
-                        option_ru=option_ru,
-                        option_kg=option_kg,
-                        is_correct=True if correct == "on" else False
-                    )
+                        question.options.create(
+                            option_ru=option_ru,
+                            option_kg=option_kg,
+                            is_correct=True if correct == "on" else False
+                        )
 
+            messages.success(request, "Вопросы были успешно загружены.")
             return redirect('/admin/main/question')
 
 

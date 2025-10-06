@@ -74,7 +74,7 @@ class AnswersView(TemplateView):
                     doc.add_paragraph(f'Сиздин жообу: {answer.employee_option.option_kg}')
                 else:
                     doc.add_paragraph(f'Сиздин жообу: Жооп тандалган жок')
-                doc.add_paragraph(f'Туура жооп: {correct_answer.employee_option_kg if correct_answer else "Туура жооп көрсөтүлгөн эмес"}')
+                doc.add_paragraph(f'Туура жооп: {correct_answer.option_kg if correct_answer else "Туура жооп көрсөтүлгөн эмес"}')
 
             buffer = io.BytesIO()
             doc.save(buffer)

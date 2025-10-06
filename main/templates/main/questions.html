@@ -64,7 +64,7 @@
             const form = document.getElementById('question-form');
             const formData = new FormData(form);
 
-            fetch("{% url 'main:questions' %}", {
+            fetch("{% url 'main:answers' %}", {
                 method: "POST",
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",

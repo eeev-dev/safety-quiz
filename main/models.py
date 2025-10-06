@@ -66,7 +66,7 @@ class Category(models.Model):
 
 
 class Question(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, related_name='questions') 
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions') 
     question_ru = models.TextField("Вопрос на русском", blank=False, null=False)
     question_kg = models.TextField("Вопрос на кыргызском", blank=False, null=False)
     image = models.ImageField(upload_to='questions/', blank=True, null=True)
@@ -77,6 +77,10 @@ class Question(models.Model):
     class Meta:
         verbose_name = "вопрос"
         verbose_name_plural = "Вопросы"
+
+        constraints = [
+            models.UniqueConstraint(fields=['category', 'question_ru', 'question_kg'], name='unique_category_question_ru_kg')
+        ]
 
 
 class Option(models.Model):

@@ -49,7 +49,7 @@ class QuestionView(TemplateView):
                     date_passed = request.user.last_date_passed
                 )
 
-            context['start_timer_text'] = f"{settings.timer}:00"
-            context['millis'] = settings.timer * 60 * 1000
+            context['start_timer_text'] = f"{settings.timer}:00" if settings.timer > 9 else f"0{settings.timer}:00"
+            context['millis'] = {settings.timer} * 60 * 1000
             context['questions'] = serialize_questions(questions, request.user.lang_code)
             return TemplateResponse(request, self.template_name, context)
