@@ -74,9 +74,7 @@ def serialize_options(options, current_lang):
         for option in options
     ]
 
-
-def parse_question_block(paragraphs):
-    def split_into_blocks(paragraphs):
+def split_into_blocks(paragraphs):
         blocks = []
         current_block = []
 
@@ -94,9 +92,12 @@ def parse_question_block(paragraphs):
 
         return blocks
 
+def parse_question_block(paragraphs):
     all_questions = []
 
     blocks = split_into_blocks(paragraphs)
+
+    total_fields = 0
 
     for block in blocks:
         question = {"ru": "", "kg": ""}
@@ -121,7 +122,13 @@ def parse_question_block(paragraphs):
                     ru_part, kg_part = text.split("~", 1)
 
                     ru_option = re.sub(r"^[A-Za-zА-Яа-я]\.\s*", "", ru_part.strip()).strip()
-                    kg_option = re.sub(r"^[A-Za-zА-Яа-я]\.\s*", "", kg_part.strip()).strip()
+                   
+                    kg_part_clean = kg_part.strip()
+
+                    if re.match(r"^[A-Za-zА-Яа-я]\.\s*", kg_part_clean):
+                        kg_option = re.sub(r"^[A-Za-zА-Яа-я]\.\s*", "", kg_part_clean).strip()
+                    else:
+                        kg_option = kg_part_clean
 
                     is_correct = False
                     if p.runs:
@@ -137,7 +144,12 @@ def parse_question_block(paragraphs):
                         "is_correct": is_correct
                     })
                     option_counter += 1
-
+        
+        total_fields += 2
+        total_fields += len(options) * 3
+        if total_fields > 990:
+            return []
+        
         all_questions.append({
             "question": question,
             "options": options

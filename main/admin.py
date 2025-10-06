@@ -11,6 +11,7 @@ from rangefilter.filters import DateRangeFilter
 from datetime import timedelta, datetime
 from django.db import IntegrityError
 from django.contrib import messages
+from django.db.models import Count, Q
 
 
 class PositionInline(admin.TabularInline):
@@ -121,8 +122,30 @@ class UploadForm(forms.Form):
 
 
 class HasCorrectFilter(SimpleListFilter):
-    title = 'Есть правильный вариант'
-    parameter_name = 'has_correct'
+    title = 'Ровно один правильный ответ'
+    parameter_name = 'exactly_one_correct'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Только один правильный'),
+            ('no', 'Ноль или более одного'),
+        )
+
+    def queryset(self, request, queryset):
+        qs = queryset.annotate(
+            correct_count=Count('options', filter=Q(options__is_correct=True))
+        )
+
+        if self.value() == 'yes':
+            return qs.filter(correct_count=1)
+        elif self.value() == 'no':
+            return qs.exclude(correct_count=1)
+        return qs
+    
+
+class HasOptionsFilter(SimpleListFilter):
+    title = 'Есть варианты ответов'
+    parameter_name = 'has_options'
 
     def lookups(self, request, model_admin):
         return (
@@ -131,17 +154,18 @@ class HasCorrectFilter(SimpleListFilter):
         )
 
     def queryset(self, request, queryset):
+        qs = queryset.annotate(option_count=Count('options'))
         if self.value() == 'yes':
-            return queryset.filter(options__is_correct=True).distinct()
+            return qs.filter(option_count__gt=0)
         elif self.value() == 'no':
-            return queryset.exclude(options__is_correct=True).distinct()
-        return queryset
+            return qs.filter(option_count=0)
+        return qs
 
 
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ['category', 'question_ru', 'question_kg']
     inlines = [OptionInline]
-    list_filter = ['category', HasCorrectFilter]
+    list_filter = ['category', HasCorrectFilter, HasOptionsFilter]
     search_fields = ['question_ru', 'question_kg']
     change_list_template = "admin/main/question/change_list.html"
 
@@ -176,7 +200,7 @@ class QuestionAdmin(admin.ModelAdmin):
                     question_kg=question_kg
                 )
 
-                if not created:
+                if created:
                     for opt_idx in option_indices:
                         option_ru = request.POST.get(f"option_{q_idx}_ru_{opt_idx}")
                         option_kg = request.POST.get(f"option_{q_idx}_kg_{opt_idx}")
@@ -203,6 +227,10 @@ class QuestionAdmin(admin.ModelAdmin):
                 paragraphs = doc.paragraphs
                 results = parse_question_block(paragraphs)
                 
+                if not results:
+                    messages.error(request, "Превышен лимит абзацев. Удалите несколько вопросов из документа и повторите попытку.")
+                    return redirect('/admin/main/question/import-questions')
+
                 return render(request, "admin/edit_parse_results.html", {
                     "results": list(enumerate(results, 1)),
                     "category_id": category_id,
