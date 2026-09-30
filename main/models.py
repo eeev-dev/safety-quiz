@@ -66,10 +66,10 @@ class Category(models.Model):
 
 
 class Question(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions') 
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions', verbose_name="Категория") 
     question_ru = models.TextField("Вопрос на русском", blank=False, null=False)
     question_kg = models.TextField("Вопрос на кыргызском", blank=False, null=False)
-    image = models.ImageField(upload_to='questions/', blank=True, null=True)
+    image = models.ImageField(upload_to='questions/', blank=True, null=True, verbose_name="Изображение")
 
     def __str__(self):
         return self.question_ru
